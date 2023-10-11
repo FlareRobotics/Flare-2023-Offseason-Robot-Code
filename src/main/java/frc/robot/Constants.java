@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
+//CTRE IMPORTS
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+//REV IMPORTS
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -62,15 +64,22 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 14;
     public static final int kRearRightTurningCanId = 16;
 
+    public static final int gyroCanId = 0;
     public static final boolean kGyroReversed = false;
   }
 
   public static final class ModuleConstants {
+    // Constants for Feedforward from SYSID
+    public static final double kS = 0.0;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
     // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a
     // robot that drives faster).
     public static final int kDrivingMotorPinionTeeth = 14;
 
+    // Max speed of one module with 14T gear and Falcon 500 in m/s
+    public static final double kmaxSpeed = 5.0; 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
     public static final boolean kTurningEncoderInverted = true;
@@ -109,8 +118,8 @@ public final class Constants {
     public static final double kTurningMinOutput = -1;
     public static final double kTurningMaxOutput = 1;
 
-    public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
+    public static final NeutralMode kDrivingMotorNeutralMode = NeutralMode.Coast;
 
     public static final int kDrivingMotorCurrentLimit = 50; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
