@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-
+//CTRE Imports
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -15,7 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -238,8 +237,8 @@ public class DriveSubsystem extends SubsystemBase {
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
-   */
+   
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  }
+  }*/
 }
