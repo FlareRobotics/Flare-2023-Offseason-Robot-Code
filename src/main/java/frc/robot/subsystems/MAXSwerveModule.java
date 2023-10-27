@@ -46,7 +46,7 @@ public class MAXSwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, boolean drivingReversed, boolean turningReversed) {
     m_drivingTalon = new TalonFX(drivingCANId);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -54,7 +54,7 @@ public class MAXSwerveModule {
     // them. This is useful in case a SPARK MAX is swapped out.
     // Same for TalonFX
     m_drivingTalon.configFactoryDefault();
-    m_turningSparkMax.restoreFactoryDefaults();
+    //m_turningSparkMax.restoreFactoryDefaults();
 
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     m_turningEncoder = m_turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
@@ -63,7 +63,8 @@ public class MAXSwerveModule {
 
     /* Configure TalonFX's Sensor Source for Pirmary PID */
     m_drivingTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
-
+    m_drivingTalon.setInverted(drivingReversed);
+    
     // Apply position and velocity conversion factors for the driving encoder. The
     // native units for position and velocity are rotations and RPM, respectively,
     // but we want meters and meters per second to use with WPILib's swerve APIs.
@@ -77,7 +78,7 @@ public class MAXSwerveModule {
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
-    m_turningEncoder.setInverted(ModuleConstants.kTurningEncoderInverted);
+    m_turningEncoder.setInverted(turningReversed);
 
     // Enable PID wrap around for the turning motor. This will allow the PID
     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
