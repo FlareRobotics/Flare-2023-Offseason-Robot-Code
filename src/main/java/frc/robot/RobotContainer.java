@@ -53,7 +53,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true, false,true),
+                true, true,true),
             m_robotDrive));
   }
 
@@ -67,6 +67,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(m_driverController, XboxController.Button.kA.value).onTrue(new RunCommand(() -> m_robotDrive.m_gyro.setYaw(0)));
 
   }
 

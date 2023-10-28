@@ -8,6 +8,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 // Rev Imports
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -166,6 +168,8 @@ public class MAXSwerveModule {
    * @return Motor position in meters.
    */
   public double getDriveMotorPosition(){
+    if(m_drivingTalon.getDeviceID() == 4)
+       SmartDashboard.putNumber("Encoder Drive", Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(), ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction));
     return Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(), ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
   }
 
