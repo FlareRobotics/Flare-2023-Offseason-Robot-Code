@@ -1,48 +1,66 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-/*import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;*/
 import edu.wpi.first.wpilibj.XboxController;
-//import frc.robot.Constants.AutoConstants;
-//import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-//import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-//import java.util.List;
+import frc.robot.Custom.Distance_State;
+import frc.robot.Custom.ResetRobot;
+import frc.robot.Custom.RobotState;
+import frc.robot.Custom.RobotStateChanger;
+import frc.robot.Custom.SupplyGather;
+import frc.robot.SwerveConstants.OIConstants;
+import frc.robot.commands.Arm.AutoArm;
+import frc.robot.commands.Arm.ManuelArm;
+import frc.robot.commands.Claw.ClawSet;
+import frc.robot.commands.Claw.ToggleCompressor;
+import frc.robot.commands.Drive.JoystickDriveCommand;
+import frc.robot.commands.Drive.TurnDegrees;
+import frc.robot.commands.Elevator.AutoElevator;
+import frc.robot.commands.Elevator.ManuelElevator;
+import frc.robot.commands.Led.LedController;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 
-/*
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
- */
+//8054 <3
 public class RobotContainer {
-  // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+    public static XboxController driver_main = new XboxController(1);
+    public static XboxController driver_2 = new XboxController(2);
+    private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
+    private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    private static final ArmSubsystem armSubsystem = new ArmSubsystem();
+    private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    public final static LedSubsystem ledSubsystem = new LedSubsystem();
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    // Configure the button bindings
-    configureButtonBindings();
+    public static SendableChooser<Integer> autoChooser = new SendableChooser<>();
+
+    public static boolean clawOpen = true;
+    public static RobotState currentState = RobotState.None;
+    public static boolean wantedCone = false;
+    public float turn_rate = 2.0f; 
+    public RobotContainer() {
+        configureButtonBindings();
+        autoChooser.setDefaultOption("No Auto", 0);
+        autoChooser.addOption("Mobility", 1);
+        autoChooser.addOption("Balance", 2);
+        autoChooser.addOption("Middle Cube", 4);
+        autoChooser.addOption("Middle Cone + Mobility", 5);
+        autoChooser.addOption("Middle Cube + Turn + Balance", 7);
+        autoChooser.addOption("Middle Cube + Mobility", 8);
+        SmartDashboard.putData(autoChooser);
+
+        ledSubsystem.setDefaultCommand(new LedController(ledSubsystem));
+        // Configure the button bindings
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -50,34 +68,83 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driver_main.getLeftY(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driver_main.getLeftX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(driver_main.getRightX(), OIConstants.kDriveDeadband),
                 true, true,true),
             m_robotDrive));
-  }
+    }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-   * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-   * passing it to a
-   * {@link JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    new JoystickButton(m_driverController, XboxController.Button.kA.value).onTrue(new RunCommand(() -> m_robotDrive.m_gyro.setYaw(0)));
+    private void configureButtonBindings() {
+        // Manuel Elevator
+        new JoystickButton(driver_2, 8)
+                .whileTrue(new ManuelElevator(elevatorsubsystem, true));
+        new JoystickButton(driver_2, 7)
+                .whileTrue(new ManuelElevator(elevatorsubsystem, false));
 
-  }
+        // Manuel Arm
+        new JoystickButton(driver_main, XboxController.Button.kB.value).whileTrue(new ManuelArm(armSubsystem, true));
+        new JoystickButton(driver_main, XboxController.Button.kX.value).whileTrue(new ManuelArm(armSubsystem, false));
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // Until a good calibration and some driving test, no autos will be tested.
-  return null;
-  }
+        // Compressor Toggle
+        new JoystickButton(driver_main, XboxController.Button.kStart.value)
+                .toggleOnTrue(new ToggleCompressor(clawSubsystem));
+
+        // Claw For Cone
+        new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
+                .toggleOnTrue(new ClawSet(clawSubsystem));
+
+        // Wanted Status
+        new JoystickButton(driver_2, 5).toggleOnTrue(new SupplyGather(ledSubsystem));
+        // Reset Encoders
+        new JoystickButton(driver_2, 9).whileTrue(new ResetRobot(armSubsystem, elevatorsubsystem, clawSubsystem));
+        // Home Elevator PID
+        // new JoystickButton(driver_2, 3).whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Zero_All));
+
+        // // Auto Elevator
+        // new JoystickButton(driver_2, 2)
+        //         .whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator));
+
+        // new JoystickButton(driver_2, 1)
+        //         .whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator));
+
+        // Led Close
+        new JoystickButton(driver_2, 11).whileTrue(new RobotStateChanger(0));
+
+        // Substation Test
+        new JoystickButton(driver_2, 6).toggleOnTrue(
+                new ParallelCommandGroup(new AutoElevator(elevatorsubsystem, Distance_State.Substation_Elevator),
+                        new SequentialCommandGroup(new WaitCommand(1d),
+                                new AutoArm(armSubsystem, Distance_State.Substation_Arm))));
+
+        new JoystickButton(driver_2, 1).toggleOnTrue(new ParallelCommandGroup(
+                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
+                new SequentialCommandGroup(
+                        new WaitCommand(.5),
+                        new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
+
+        new JoystickButton(driver_2, 4).toggleOnTrue(new ParallelCommandGroup(
+                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator_Auto),
+                new SequentialCommandGroup(
+                        new WaitCommand(.5),
+                        new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
+
+        new JoystickButton(driver_2, 2).toggleOnTrue(new ParallelCommandGroup(
+                new AutoArm(armSubsystem, Distance_State.Zero_All),
+                new SequentialCommandGroup(
+                        new WaitCommand(.8),
+                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All))));
+
+        new JoystickButton(driver_2, 3).toggleOnTrue(new AutoArm(armSubsystem, Distance_State.Zero_All));
+
+       
+        new JoystickButton(driver_main, XboxController.Button.kLeftStick.value).whileTrue(new RunCommand(() -> turn_rate = 2.8f));
+       new JoystickButton(driver_main, XboxController.Button.kRightStick.value).whileTrue(new RunCommand(() -> turn_rate = 2.0f));
+       
+    }
+
+    
+    public Command getAutonomousCommand() {
+        return null;
+    }
 }

@@ -25,7 +25,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 
 //File Imports
 import frc.lib.math.Conversions;
-import frc.robot.Constants.ModuleConstants;
+import frc.robot.SwerveConstants.ModuleConstants;
 
 public class MAXSwerveModule {
   
@@ -148,6 +148,11 @@ public class MAXSwerveModule {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+
+    if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
+      stop();
+      return;
+  }
     // Apply chassis angular offset to the desired state.
     // Set speed of Falcon    
     setSpeed(desiredState, isOpenLoop);
@@ -156,6 +161,11 @@ public class MAXSwerveModule {
 
     m_desiredState = desiredState;
   }
+
+  public void stop() {
+    m_drivingTalon.set(ControlMode.PercentOutput, 0);
+    m_turningSparkMax.set(0);
+}
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
