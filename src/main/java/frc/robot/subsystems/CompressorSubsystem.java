@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Compressor;
 public class CompressorSubsystem extends SubsystemBase {
 
   public static Compressor Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
-  
+
   public CompressorSubsystem() {
 
   }
@@ -19,7 +19,5 @@ public class CompressorSubsystem extends SubsystemBase {
 
   public void setDash() {
   }
-
-
 
 }

@@ -41,8 +41,7 @@ public final class Constants {
         // All in cm
         public static int middle_row_distance = 380000;
         public static int middle_row_distance_Cone = 340000;
-        public static int substation_distance = 200000
-        ;
+        public static int substation_distance = 200000;
     }
 
     public static class ClawConstants {
@@ -69,7 +68,6 @@ public final class Constants {
         public static final double TARGET_HEIGHT_METERS = 2.55d;
         public static final String Camera_Name = "Camera";
     }
-
 
     public static final class LedConstans {
         public static final int led_port_sag = 9;

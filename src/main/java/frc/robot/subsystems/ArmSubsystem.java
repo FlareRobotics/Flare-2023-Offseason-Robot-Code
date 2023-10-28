@@ -22,8 +22,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     /* Configure Sensor Source for Pirmary PID */
     arm_motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-                    PidConstants.TurretConstants.kPIDLoopIdx,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kPIDLoopIdx,
+        PidConstants.TurretConstants.kTimeoutMs);
 
     /*
      * set deadband to super small 0.001 (0.1 %).
@@ -51,29 +51,29 @@ public class ArmSubsystem extends SubsystemBase {
 
     /* Set relevant frame periods to be at least as fast as periodic rate */
     arm_motor.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
 
     /* Set the peak and nominal outputs */
     arm_motor.configNominalOutputForward(0, PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.configNominalOutputReverse(0, PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.configPeakOutputForward(PidConstants.TurretConstants.kGains.kPeakOutput,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.configPeakOutputReverse(-PidConstants.TurretConstants.kGains.kPeakOutput,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
 
     /* Set Motion Magic gains in slot0 - see documentation */
     arm_motor.selectProfileSlot(PidConstants.TurretConstants.kSlotIdx,
-                    PidConstants.TurretConstants.kPIDLoopIdx);
+        PidConstants.TurretConstants.kPIDLoopIdx);
     arm_motor.config_kF(PidConstants.TurretConstants.kSlotIdx, PidConstants.TurretConstants.kGains.kF,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.config_kP(PidConstants.TurretConstants.kSlotIdx, PidConstants.TurretConstants.kGains.kP,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.config_kI(PidConstants.TurretConstants.kSlotIdx, PidConstants.TurretConstants.kGains.kI,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
     arm_motor.config_kD(PidConstants.TurretConstants.kSlotIdx, PidConstants.TurretConstants.kGains.kD,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
 
     /* Set acceleration and vcruise velocity - see documentation */
     arm_motor.configMotionCruiseVelocity(15000, PidConstants.TurretConstants.kTimeoutMs);
@@ -81,7 +81,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     /* Zero the sensor once on robot boot up */
     arm_motor.setSelectedSensorPosition(0, PidConstants.TurretConstants.kPIDLoopIdx,
-                    PidConstants.TurretConstants.kTimeoutMs);
+        PidConstants.TurretConstants.kTimeoutMs);
 
     arm_motor.setNeutralMode(NeutralMode.Coast);
 
@@ -90,9 +90,9 @@ public class ArmSubsystem extends SubsystemBase {
     arm_motor.configForwardSoftLimitThreshold(Constants.ElevatorConstants.elevator_forward_limit);
     arm_motor.configReverseSoftLimitThreshold(0);
 
-    //arm_motor.configForwardSoftLimitEnable(true, 0);
-  //  arm_motor.configReverseSoftLimitEnable(true, 0);
-}
+    // arm_motor.configForwardSoftLimitEnable(true, 0);
+    // arm_motor.configReverseSoftLimitEnable(true, 0);
+  }
 
   @Override
   public void periodic() {
@@ -118,9 +118,9 @@ public class ArmSubsystem extends SubsystemBase {
     return (int) (2048 * ArmConstants.arm_gear_ratio * cm / ArmConstants.arm_distance_per_rotation);
   }
 
-  public static void reset_arm_to_safe(){
-    if(arm_motor.getSelectedSensorPosition()<0){
-        arm_motor.set(TalonFXControlMode.MotionMagic,Math.abs(arm_motor.getSelectedSensorPosition()));
+  public static void reset_arm_to_safe() {
+    if (arm_motor.getSelectedSensorPosition() < 0) {
+      arm_motor.set(TalonFXControlMode.MotionMagic, Math.abs(arm_motor.getSelectedSensorPosition()));
     }
   }
 }

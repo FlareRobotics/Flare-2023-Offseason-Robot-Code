@@ -90,7 +90,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 elevator_motor.configReverseSoftLimitThreshold(0);
 
                 elevator_motor.configForwardSoftLimitEnable(true, 0);
-              //elevator_motor.configReverseSoftLimitEnable(true, 0);
+                // elevator_motor.configReverseSoftLimitEnable(true, 0);
         }
 
         @Override
@@ -119,9 +119,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                                 / ElevatorConstants.elevator_distance_per_rotation);
         }
 
-        public static void reset_elevator_to_safe(){
-                if(elevator_motor.getSelectedSensorPosition()<0){
-                        elevator_motor.set(TalonFXControlMode.MotionMagic,Math.abs(elevator_motor.getSelectedSensorPosition()));
+        public static void reset_elevator_to_safe() {
+                if (elevator_motor.getSelectedSensorPosition() < 0) {
+                        elevator_motor.set(TalonFXControlMode.MotionMagic,
+                                        Math.abs(elevator_motor.getSelectedSensorPosition()));
                 }
-}
+        }
 }

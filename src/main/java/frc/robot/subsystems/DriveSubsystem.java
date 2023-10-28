@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+
 //CTRE Imports
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -48,7 +49,7 @@ public class DriveSubsystem extends SubsystemBase {
       false, true);
 
   // The gyro sensor
-  public static final Pigeon2 m_gyro = new Pigeon2(DriveConstants.gyroCanId); 
+  public static final Pigeon2 m_gyro = new Pigeon2(DriveConstants.gyroCanId);
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -68,10 +69,12 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      }, new Pose2d(3, 3, Rotation2d.fromDegrees(m_gyro.getYaw())));
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    resetEncoders();
+    zeroHeading();
   }
 
   private final Field2d mField2d = new Field2d();
@@ -88,9 +91,16 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
 
-        mField2d.setRobotPose(m_odometry.getPoseMeters());
+    mField2d.setRobotPose(m_odometry.getPoseMeters());
 
-        SmartDashboard.putData(mField2d);
+    SmartDashboard.putData(mField2d);
+    SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+    SmartDashboard.putNumber("Gyro angle", m_gyro.getYaw());
+    
+    SmartDashboard.putNumber("FL Angle Degrees", m_frontLeft.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("FR Angle Degrees", m_frontRight.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("BL Angle Degrees", m_rearLeft.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("BR Angle Degrees", m_rearRight.getPosition().angle.getDegrees());
   }
 
   /**
@@ -129,8 +139,9 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit, boolean isOpenLoop) {
-    
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit,
+      boolean isOpenLoop) {
+
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -139,42 +150,40 @@ public class DriveSubsystem extends SubsystemBase {
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
       double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
 
-      // Calculate the direction slew rate based on an estimate of the lateral acceleration
+      // Calculate the direction slew rate based on an estimate of the lateral
+      // acceleration
       double directionSlewRate;
       if (m_currentTranslationMag != 0.0) {
         directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
       } else {
-        directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+        directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
       }
-      
 
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - m_prevTime;
       double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
-      if (angleDif < 0.45*Math.PI) {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+      if (angleDif < 0.45 * Math.PI) {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
         m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-      }
-      else if (angleDif > 0.85*Math.PI) {
-        if (m_currentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
+      } else if (angleDif > 0.85 * Math.PI) {
+        if (m_currentTranslationMag > 1e-4) { // some small number to avoid floating-point errors with equality checking
           // keep currentTranslationDir unchanged
           m_currentTranslationMag = m_magLimiter.calculate(0.0);
-        }
-        else {
+        } else {
           m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
           m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
         }
-      }
-      else {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+      } else {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
         m_currentTranslationMag = m_magLimiter.calculate(0.0);
       }
       m_prevTime = currentTime;
-      
+
       xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
       ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
       m_currentRotation = m_rotLimiter.calculate(rot);
-
 
     } else {
       xSpeedCommanded = xSpeed;
@@ -189,14 +198,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(m_gyro.getYaw()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+                Rotation2d.fromDegrees(m_gyro.getYaw()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(swerveModuleStates[0],isOpenLoop);
-    m_frontRight.setDesiredState(swerveModuleStates[1],isOpenLoop);
-    m_rearLeft.setDesiredState(swerveModuleStates[2],isOpenLoop);
-    m_rearRight.setDesiredState(swerveModuleStates[3],isOpenLoop);
+    m_frontLeft.setDesiredState(swerveModuleStates[0], isOpenLoop);
+    m_frontRight.setDesiredState(swerveModuleStates[1], isOpenLoop);
+    m_rearLeft.setDesiredState(swerveModuleStates[2], isOpenLoop);
+    m_rearRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
   }
 
   /**
@@ -217,10 +227,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0],isOpenLoop);
-    m_frontRight.setDesiredState(desiredStates[1],isOpenLoop);
-    m_rearLeft.setDesiredState(desiredStates[2],isOpenLoop);
-    m_rearRight.setDesiredState(desiredStates[3],isOpenLoop);
+    m_frontLeft.setDesiredState(desiredStates[0], isOpenLoop);
+    m_frontRight.setDesiredState(desiredStates[1], isOpenLoop);
+    m_rearLeft.setDesiredState(desiredStates[2], isOpenLoop);
+    m_rearRight.setDesiredState(desiredStates[3], isOpenLoop);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -232,7 +242,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public static  void zeroHeading() {
+  public static void zeroHeading() {
     m_gyro.setYaw(0);
   }
 
@@ -249,8 +259,10 @@ public class DriveSubsystem extends SubsystemBase {
    * Returns the turn rate of the robot.
    *
    * @return The turn rate of the robot, in degrees per second
-   
-  public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
-  }*/
+   * 
+   *         public double getTurnRate() {
+   *         return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 :
+   *         1.0);
+   *         }
+   */
 }

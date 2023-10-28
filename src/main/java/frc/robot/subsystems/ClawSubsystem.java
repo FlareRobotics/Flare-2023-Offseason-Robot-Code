@@ -11,6 +11,7 @@ public class ClawSubsystem extends SubsystemBase {
 
   public static DoubleSolenoid claw_solenoid1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
       ClawConstants.claw_solenoid1_port_ileri, ClawConstants.claw_solenoid1_port_geri);
+
   public ClawSubsystem() {
 
   }
@@ -31,6 +32,5 @@ public class ClawSubsystem extends SubsystemBase {
   public static void claw_close() {
     claw_solenoid1.set(Value.kReverse);
   }
-
 
 }

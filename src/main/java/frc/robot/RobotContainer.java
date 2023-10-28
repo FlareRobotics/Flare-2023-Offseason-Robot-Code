@@ -33,118 +33,130 @@ import frc.robot.subsystems.LedSubsystem;
 //8054 <3
 public class RobotContainer {
 
-    public static XboxController driver_main = new XboxController(1);
-    public static XboxController driver_2 = new XboxController(2);
-    private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
-    private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
-    private static final CompressorSubsystem compressorSubsystem = new CompressorSubsystem();
-    private static final ArmSubsystem armSubsystem = new ArmSubsystem();
-    private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    public final static LedSubsystem ledSubsystem = new LedSubsystem();
+        public static XboxController driver_main = new XboxController(1);
+        public static XboxController driver_2 = new XboxController(2);
+        private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
+        private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
+        private static final CompressorSubsystem compressorSubsystem = new CompressorSubsystem();
+        private static final ArmSubsystem armSubsystem = new ArmSubsystem();
+        private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
+        public final static LedSubsystem ledSubsystem = new LedSubsystem();
 
-    public static SendableChooser<Integer> autoChooser = new SendableChooser<>();
+        public static SendableChooser<Integer> autoChooser = new SendableChooser<>();
 
-    public static boolean clawOpen = true;
-    public static RobotState currentState = RobotState.None;
-    public static boolean wantedCone = false;
-    public float turn_rate = 2.0f; 
-    public RobotContainer() {
-        configureButtonBindings();
-        autoChooser.setDefaultOption("No Auto", 0);
-        autoChooser.addOption("Mobility", 1);
-        autoChooser.addOption("Balance", 2);
-        autoChooser.addOption("Middle Cube", 4);
-        autoChooser.addOption("Middle Cone + Mobility", 5);
-        autoChooser.addOption("Middle Cube + Turn + Balance", 7);
-        autoChooser.addOption("Middle Cube + Mobility", 8);
-        SmartDashboard.putData(autoChooser);
+        public static boolean clawOpen = true;
+        public static RobotState currentState = RobotState.None;
+        public static boolean wantedCone = false;
+        public float turn_rate = 2.0f;
 
-        ledSubsystem.setDefaultCommand(new LedController(ledSubsystem));
-        // Configure the button bindings
+        public RobotContainer() {
+                configureButtonBindings();
+                autoChooser.setDefaultOption("No Auto", 0);
+                autoChooser.addOption("Mobility", 1);
+                autoChooser.addOption("Balance", 2);
+                autoChooser.addOption("Middle Cube", 4);
+                autoChooser.addOption("Middle Cone + Mobility", 5);
+                autoChooser.addOption("Middle Cube + Turn + Balance", 7);
+                autoChooser.addOption("Middle Cube + Mobility", 8);
+                SmartDashboard.putData(autoChooser);
 
-    // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(driver_main.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driver_main.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(driver_main.getRightX(), OIConstants.kDriveDeadband),
-                true, true,true),
-            m_robotDrive));
-    }
+                ledSubsystem.setDefaultCommand(new LedController(ledSubsystem));
+                // Configure the button bindings
 
-    private void configureButtonBindings() {
-        // Manuel Elevator
-        new JoystickButton(driver_2, 8)
-                .whileTrue(new ManuelElevator(elevatorsubsystem, true));
-        new JoystickButton(driver_2, 7)
-                .whileTrue(new ManuelElevator(elevatorsubsystem, false));
+                // Configure default commands
+                m_robotDrive.setDefaultCommand(
+                                // The left stick controls translation of the robot.
+                                // Turning is controlled by the X axis of the right stick.
+                                new RunCommand(
+                                                () -> m_robotDrive.drive(
+                                                                -MathUtil.applyDeadband(driver_main.getLeftY(),
+                                                                                OIConstants.kDriveDeadband),
+                                                                -MathUtil.applyDeadband(driver_main.getLeftX(),
+                                                                                OIConstants.kDriveDeadband),
+                                                                -MathUtil.applyDeadband(driver_main.getRightX(),
+                                                                                OIConstants.kDriveDeadband),
+                                                                true, true, true),
+                                                m_robotDrive));
+        }
 
-        // Manuel Arm
-        new JoystickButton(driver_main, XboxController.Button.kB.value).whileTrue(new ManuelArm(armSubsystem, true));
-        new JoystickButton(driver_main, XboxController.Button.kX.value).whileTrue(new ManuelArm(armSubsystem, false));
+        private void configureButtonBindings() {
+                // Manuel Elevator
+                new JoystickButton(driver_2, 8)
+                                .whileTrue(new ManuelElevator(elevatorsubsystem, true));
+                new JoystickButton(driver_2, 7)
+                                .whileTrue(new ManuelElevator(elevatorsubsystem, false));
 
-        // Compressor Toggle
-        new JoystickButton(driver_main, XboxController.Button.kStart.value)
-                .toggleOnTrue(new ToggleCompressor(compressorSubsystem));
+                // Manuel Arm
+                new JoystickButton(driver_main, XboxController.Button.kB.value)
+                                .whileTrue(new ManuelArm(armSubsystem, true));
+                new JoystickButton(driver_main, XboxController.Button.kX.value)
+                                .whileTrue(new ManuelArm(armSubsystem, false));
 
-        // Claw For Cone
-        new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
-                .toggleOnTrue(new ClawSet(clawSubsystem));
+                // Compressor Toggle
+                new JoystickButton(driver_main, XboxController.Button.kStart.value)
+                                .toggleOnTrue(new ToggleCompressor(compressorSubsystem));
 
-        // Wanted Status
-        new JoystickButton(driver_2, 5).toggleOnTrue(new SupplyGather(ledSubsystem));
-        // Reset Encoders
-        new JoystickButton(driver_2, 9).whileTrue(new ResetRobot(armSubsystem, elevatorsubsystem, clawSubsystem));
-        // Home Elevator PID
-        // new JoystickButton(driver_2, 3).whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Zero_All));
+                // Claw For Cone
+                new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
+                                .toggleOnTrue(new ClawSet(clawSubsystem));
 
-        // // Auto Elevator
-        // new JoystickButton(driver_2, 2)
-        //         .whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator));
+                // Wanted Status
+                new JoystickButton(driver_2, 5).toggleOnTrue(new SupplyGather(ledSubsystem));
+                // Reset Encoders
+                new JoystickButton(driver_2, 9)
+                                .whileTrue(new ResetRobot(armSubsystem, elevatorsubsystem, clawSubsystem));
+                // Home Elevator PID
+                // new JoystickButton(driver_2, 3).whileTrue(new AutoElevator(elevatorsubsystem,
+                // Distance_State.Zero_All));
 
-        // new JoystickButton(driver_2, 1)
-        //         .whileTrue(new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator));
+                // // Auto Elevator
+                // new JoystickButton(driver_2, 2)
+                // .whileTrue(new AutoElevator(elevatorsubsystem,
+                // Distance_State.Middle_Cube_Elevator));
 
-        // Led Close
-        new JoystickButton(driver_2, 11).whileTrue(new RobotStateChanger(0));
+                // new JoystickButton(driver_2, 1)
+                // .whileTrue(new AutoElevator(elevatorsubsystem,
+                // Distance_State.Middle_Cone_Elevator));
 
-        // Substation Test
-        new JoystickButton(driver_2, 6).toggleOnTrue(
-                new ParallelCommandGroup(new AutoElevator(elevatorsubsystem, Distance_State.Substation_Elevator),
-                        new SequentialCommandGroup(new WaitCommand(1d),
-                                new AutoArm(armSubsystem, Distance_State.Substation_Arm))));
+                // Led Close
+                new JoystickButton(driver_2, 11).whileTrue(new RobotStateChanger(0));
 
-        new JoystickButton(driver_2, 1).toggleOnTrue(new ParallelCommandGroup(
-                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
-                new SequentialCommandGroup(
-                        new WaitCommand(.5),
-                        new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
+                // Substation Test
+                new JoystickButton(driver_2, 6).toggleOnTrue(
+                                new ParallelCommandGroup(
+                                                new AutoElevator(elevatorsubsystem, Distance_State.Substation_Elevator),
+                                                new SequentialCommandGroup(new WaitCommand(1d),
+                                                                new AutoArm(armSubsystem,
+                                                                                Distance_State.Substation_Arm))));
 
-        new JoystickButton(driver_2, 4).toggleOnTrue(new ParallelCommandGroup(
-                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator_Auto),
-                new SequentialCommandGroup(
-                        new WaitCommand(.5),
-                        new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
+                new JoystickButton(driver_2, 1).toggleOnTrue(new ParallelCommandGroup(
+                                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
+                                new SequentialCommandGroup(
+                                                new WaitCommand(.5),
+                                                new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
 
-        new JoystickButton(driver_2, 2).toggleOnTrue(new ParallelCommandGroup(
-                new AutoArm(armSubsystem, Distance_State.Zero_All),
-                new SequentialCommandGroup(
-                        new WaitCommand(.8),
-                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All))));
+                new JoystickButton(driver_2, 4).toggleOnTrue(new ParallelCommandGroup(
+                                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator_Auto),
+                                new SequentialCommandGroup(
+                                                new WaitCommand(.5),
+                                                new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
 
-        new JoystickButton(driver_2, 3).toggleOnTrue(new AutoArm(armSubsystem, Distance_State.Zero_All));
+                new JoystickButton(driver_2, 2).toggleOnTrue(new ParallelCommandGroup(
+                                new AutoArm(armSubsystem, Distance_State.Zero_All),
+                                new SequentialCommandGroup(
+                                                new WaitCommand(.8),
+                                                new AutoElevator(elevatorsubsystem, Distance_State.Zero_All))));
 
-       
-        new JoystickButton(driver_main, XboxController.Button.kLeftStick.value).whileTrue(new RunCommand(() -> turn_rate = 2.8f));
-       new JoystickButton(driver_main, XboxController.Button.kRightStick.value).whileTrue(new RunCommand(() -> turn_rate = 2.0f));
-       
-    }
+                new JoystickButton(driver_2, 3).toggleOnTrue(new AutoArm(armSubsystem, Distance_State.Zero_All));
 
-    
-    public Command getAutonomousCommand() {
-        return null;
-    }
+                new JoystickButton(driver_main, XboxController.Button.kLeftStick.value)
+                                .whileTrue(new RunCommand(() -> turn_rate = 2.8f));
+                new JoystickButton(driver_main, XboxController.Button.kRightStick.value)
+                                .whileTrue(new RunCommand(() -> turn_rate = 2.0f));
+
+        }
+
+        public Command getAutonomousCommand() {
+                return null;
+        }
 }

@@ -15,13 +15,13 @@ public class LedController extends CommandBase {
 
   @Override
   public void initialize() {
-  //  System.out.println("Led Controller Start!");
+    // System.out.println("Led Controller Start!");
   }
 
   @Override
   public void execute() {
-   
-   switch (RobotContainer.currentState) {
+
+    switch (RobotContainer.currentState) {
       case None:
         ledSubsystem.rainbow();
         break;
@@ -50,17 +50,16 @@ public class LedController extends CommandBase {
         ledSubsystem.green();
         break;
       case LedCLose:
-      ledSubsystem.close();
+        ledSubsystem.close();
       default:
         break;
     }
-   
-    }
-  
+
+  }
 
   @Override
   public void end(boolean interrupted) {
-  //  System.out.println("Led Controller End!");
+    // System.out.println("Led Controller End!");
   }
 
   @Override

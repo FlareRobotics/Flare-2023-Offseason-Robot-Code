@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 // WPILIB Imports
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // Rev Imports
 import com.revrobotics.CANSparkMax;
@@ -16,28 +16,28 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.AbsoluteEncoder;
+
 // CTRE Imports
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 
-
 //File Imports
 import frc.lib.math.Conversions;
 import frc.robot.SwerveConstants.ModuleConstants;
 
 public class MAXSwerveModule {
-  
+
   private final TalonFX m_drivingTalon;
   private final CANSparkMax m_turningSparkMax;
-  
+
   private final AbsoluteEncoder m_turningEncoder;
 
   private final SparkMaxPIDController m_turningPIDController;
 
-  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ModuleConstants.kS,ModuleConstants.kV, ModuleConstants.kA);
-
+  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ModuleConstants.kS, ModuleConstants.kV,
+      ModuleConstants.kA);
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
@@ -48,7 +48,8 @@ public class MAXSwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, boolean drivingReversed, boolean turningReversed) {
+  public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset, boolean drivingReversed,
+      boolean turningReversed) {
     m_drivingTalon = new TalonFX(drivingCANId);
     m_turningSparkMax = new CANSparkMax(turningCANId, MotorType.kBrushless);
 
@@ -56,7 +57,7 @@ public class MAXSwerveModule {
     // them. This is useful in case a SPARK MAX is swapped out.
     // Same for TalonFX
     m_drivingTalon.configFactoryDefault();
-    //m_turningSparkMax.restoreFactoryDefaults();
+    // m_turningSparkMax.restoreFactoryDefaults();
 
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     m_turningEncoder = m_turningSparkMax.getAbsoluteEncoder(Type.kDutyCycle);
@@ -66,11 +67,10 @@ public class MAXSwerveModule {
     /* Configure TalonFX's Sensor Source for Pirmary PID */
     m_drivingTalon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
     m_drivingTalon.setInverted(drivingReversed);
-    
+
     // Apply position and velocity conversion factors for the driving encoder. The
     // native units for position and velocity are rotations and RPM, respectively,
     // but we want meters and meters per second to use with WPILib's swerve APIs.
-
 
     // Apply position and velocity conversion factors for the turning encoder. We
     // want these in radians and radians per second to use with WPILib's swerve
@@ -78,7 +78,8 @@ public class MAXSwerveModule {
     m_turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderPositionFactor);
     m_turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderVelocityFactor);
 
-    // Invert the turning encoder, since the output shaft rotates in the opposite direction of
+    // Invert the turning encoder, since the output shaft rotates in the opposite
+    // direction of
     // the steering motor in the MAXSwerve Module.
     m_turningEncoder.setInverted(turningReversed);
 
@@ -90,11 +91,12 @@ public class MAXSwerveModule {
     m_turningPIDController.setPositionPIDWrappingMinInput(ModuleConstants.kTurningEncoderPositionPIDMinInput);
     m_turningPIDController.setPositionPIDWrappingMaxInput(ModuleConstants.kTurningEncoderPositionPIDMaxInput);
 
-    // Set the PID gains for the driving motor. Note these are example gains, and you
+    // Set the PID gains for the driving motor. Note these are example gains, and
+    // you
     // may need to tune them for your own robot!(P,I,D,FF)
-    
 
-    // Set the PID gains for the turning motor. Note these are example gains, and you
+    // Set the PID gains for the turning motor. Note these are example gains, and
+    // you
     // may need to tune them for your own robot!
     m_turningPIDController.setP(ModuleConstants.kTurningP);
     m_turningPIDController.setI(ModuleConstants.kTurningI);
@@ -105,7 +107,7 @@ public class MAXSwerveModule {
 
     m_drivingTalon.setNeutralMode(ModuleConstants.kDrivingMotorNeutralMode);
     m_turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
-    //No current limit is set for driving motor
+    // No current limit is set for driving motor
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
 
     // Save the SPARK MAX configurations. If a SPARK MAX browns out during
@@ -125,7 +127,9 @@ public class MAXSwerveModule {
   public SwerveModuleState getState() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    return new SwerveModuleState(Conversions.falconToMPS(m_drivingTalon.getSelectedSensorVelocity(), ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction),
+    return new SwerveModuleState(
+        Conversions.falconToMPS(m_drivingTalon.getSelectedSensorVelocity(), ModuleConstants.kWheelCircumferenceMeters,
+            ModuleConstants.kDrivingMotorReduction),
         new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
   }
 
@@ -152,12 +156,13 @@ public class MAXSwerveModule {
     if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
       stop();
       return;
-  }
+    }
     // Apply chassis angular offset to the desired state.
-    // Set speed of Falcon    
+    // Set speed of Falcon
     setSpeed(desiredState, isOpenLoop);
     // Command driving and turning SPARKS MAX towards their respective setpoints.
-    m_turningPIDController.setReference(desiredState.angle.getRadians() + m_chassisAngularOffset, CANSparkMax.ControlType.kPosition);
+    m_turningPIDController.setReference(desiredState.angle.getRadians() + m_chassisAngularOffset,
+        CANSparkMax.ControlType.kPosition);
 
     m_desiredState = desiredState;
   }
@@ -165,32 +170,32 @@ public class MAXSwerveModule {
   public void stop() {
     m_drivingTalon.set(ControlMode.PercentOutput, 0);
     m_turningSparkMax.set(0);
-}
+  }
 
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_drivingTalon.setSelectedSensorPosition(0);
   }
 
-    /**
+  /**
    * Calculates distance by drive motors encoder.
    *
    * @return Motor position in meters.
    */
-  public double getDriveMotorPosition(){
-    if(m_drivingTalon.getDeviceID() == 4)
-       SmartDashboard.putNumber("Encoder Drive", Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(), ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction));
-    return Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(), ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
+  public double getDriveMotorPosition() {
+    return Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(),
+        ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
   }
 
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
-    if(isOpenLoop){
-        double percentOutput = desiredState.speedMetersPerSecond / ModuleConstants.kmaxSpeed;
-        m_drivingTalon.set(ControlMode.PercentOutput, percentOutput);
+  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+    if (isOpenLoop) {
+      double percentOutput = desiredState.speedMetersPerSecond / ModuleConstants.kmaxSpeed;
+      m_drivingTalon.set(ControlMode.PercentOutput, percentOutput);
+    } else {
+      double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
+          ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
+      m_drivingTalon.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward,
+          feedforward.calculate(desiredState.speedMetersPerSecond));
     }
-    else {
-        double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
-        m_drivingTalon.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, feedforward.calculate(desiredState.speedMetersPerSecond));
-    }
-}
+  }
 }

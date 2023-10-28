@@ -38,7 +38,6 @@ public class ManuelArm extends CommandBase {
     ArmSubsystem.arm_motor.set(0);
   }
 
-
   @Override
   public boolean isFinished() {
     return false;

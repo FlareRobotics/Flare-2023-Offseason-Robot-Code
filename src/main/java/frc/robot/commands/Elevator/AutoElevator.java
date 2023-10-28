@@ -1,6 +1,5 @@
 package frc.robot.commands.Elevator;
 
-
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Custom.Distance_State;
 import frc.robot.PID.PidConstants;
@@ -26,8 +25,8 @@ public class AutoElevator extends CommandBase {
     System.out.println("AUTO Elevator Start");
     switch (yukseklik) {
       case Zero_All:
-      goal = 0;
-      break;
+        goal = 0;
+        break;
       // Alt
       case Middle_Cube_Elevator:
         goal = ElevatorConstants.middle_row_height_cube;
@@ -55,13 +54,10 @@ public class AutoElevator extends CommandBase {
 
   @Override
   public void execute() {
-    if(goal > ElevatorSubsystem.elevator_motor.getSelectedSensorPosition())
-    {
+    if (goal > ElevatorSubsystem.elevator_motor.getSelectedSensorPosition()) {
       ElevatorSubsystem.elevator_motor.configMotionCruiseVelocity(15000, PidConstants.TurretConstants.kTimeoutMs);
       ElevatorSubsystem.elevator_motor.configMotionAcceleration(18000, PidConstants.TurretConstants.kTimeoutMs);
-    }
-    else
-    {
+    } else {
       ElevatorSubsystem.elevator_motor.configMotionCruiseVelocity(10000, PidConstants.TurretConstants.kTimeoutMs);
       ElevatorSubsystem.elevator_motor.configMotionAcceleration(15000, PidConstants.TurretConstants.kTimeoutMs);
     }
