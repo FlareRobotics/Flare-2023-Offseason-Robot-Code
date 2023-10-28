@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 // WPILIB Imports
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
@@ -40,7 +41,6 @@ public class MAXSwerveModule {
       ModuleConstants.kA);
 
   private double m_chassisAngularOffset = 0;
-  private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -115,8 +115,10 @@ public class MAXSwerveModule {
     m_turningSparkMax.burnFlash();
 
     m_chassisAngularOffset = chassisAngularOffset;
-    m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingTalon.setSelectedSensorPosition(0);
+
+    m_turningPIDController.setReference( m_chassisAngularOffset,
+        CANSparkMax.ControlType.kPosition);
   }
 
   /**
@@ -153,18 +155,20 @@ public class MAXSwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
 
-    if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
+    if (Math.abs(desiredState.speedMetersPerSecond) < 0.01) {
       stop();
       return;
     }
+
+    SwerveModuleState optiSwerveModuleState = SwerveModuleState.optimize(desiredState, Rotation2d.fromRadians(m_turningEncoder.getPosition() > 6.23 ? 0 :  m_turningEncoder.getPosition()));
+    // Command driving and turning SPARKS MAX towards their respective setpoints.
+
     // Apply chassis angular offset to the desired state.
     // Set speed of Falcon
-    setSpeed(desiredState, isOpenLoop);
-    // Command driving and turning SPARKS MAX towards their respective setpoints.
-    m_turningPIDController.setReference(desiredState.angle.getRadians() + m_chassisAngularOffset,
-        CANSparkMax.ControlType.kPosition);
+    setSpeed(optiSwerveModuleState, isOpenLoop);
 
-    m_desiredState = desiredState;
+    m_turningPIDController.setReference(optiSwerveModuleState.angle.getRadians() + m_chassisAngularOffset,
+        CANSparkMax.ControlType.kPosition);
   }
 
   public void stop() {
