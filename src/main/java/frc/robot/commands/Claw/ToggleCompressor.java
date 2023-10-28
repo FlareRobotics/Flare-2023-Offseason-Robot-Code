@@ -1,11 +1,10 @@
 package frc.robot.commands.Claw;
-
-import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.CompressorSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ToggleCompressor extends CommandBase {
 
-  public ToggleCompressor(ClawSubsystem subsystem) {
+  public ToggleCompressor(CompressorSubsystem subsystem) {
     addRequirements(subsystem);
   }
 
@@ -16,12 +15,12 @@ public class ToggleCompressor extends CommandBase {
 
   @Override
   public void execute() {
-    ClawSubsystem.Compressor.enableDigital();
+    CompressorSubsystem.Compressor.enableDigital();
   }
 
   @Override
   public void end(boolean interrupted) {
-    ClawSubsystem.Compressor.disable();
+    CompressorSubsystem.Compressor.disable();
   //  System.out.println("Toggle Compressor End!");
   }
 

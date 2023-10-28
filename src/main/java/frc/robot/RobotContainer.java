@@ -20,13 +20,12 @@ import frc.robot.commands.Arm.AutoArm;
 import frc.robot.commands.Arm.ManuelArm;
 import frc.robot.commands.Claw.ClawSet;
 import frc.robot.commands.Claw.ToggleCompressor;
-import frc.robot.commands.Drive.JoystickDriveCommand;
-import frc.robot.commands.Drive.TurnDegrees;
 import frc.robot.commands.Elevator.AutoElevator;
 import frc.robot.commands.Elevator.ManuelElevator;
 import frc.robot.commands.Led.LedController;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.CompressorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.LedSubsystem;
@@ -38,6 +37,7 @@ public class RobotContainer {
     public static XboxController driver_2 = new XboxController(2);
     private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
     private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
+    private static final CompressorSubsystem compressorSubsystem = new CompressorSubsystem();
     private static final ArmSubsystem armSubsystem = new ArmSubsystem();
     private static final DriveSubsystem m_robotDrive = new DriveSubsystem();
     public final static LedSubsystem ledSubsystem = new LedSubsystem();
@@ -88,7 +88,7 @@ public class RobotContainer {
 
         // Compressor Toggle
         new JoystickButton(driver_main, XboxController.Button.kStart.value)
-                .toggleOnTrue(new ToggleCompressor(clawSubsystem));
+                .toggleOnTrue(new ToggleCompressor(compressorSubsystem));
 
         // Claw For Cone
         new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
