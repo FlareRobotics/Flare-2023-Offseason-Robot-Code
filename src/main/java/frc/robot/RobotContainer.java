@@ -18,6 +18,8 @@ import frc.robot.Custom.SupplyGather;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.commands.Arm.AutoArm;
 import frc.robot.commands.Arm.ManuelArm;
+import frc.robot.commands.Auto.BackPigeon;
+import frc.robot.commands.Auto.ClimbPigeon;
 import frc.robot.commands.Claw.ClawSet;
 import frc.robot.commands.Claw.ToggleCompressor;
 import frc.robot.commands.Elevator.AutoElevator;
@@ -157,6 +159,17 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-                return null;
+                return new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                                new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
+                                new SequentialCommandGroup(
+                                        new WaitCommand(.5),
+                                        new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))),
+                        new ClawSet(clawSubsystem).withTimeout(0.5d),
+                        new AutoArm(armSubsystem, Distance_State.Zero_All),
+                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All),
+                        new RobotStateChanger(1), 
+                        new BackPigeon(m_robotDrive, -3),
+                        new ClimbPigeon(m_robotDrive, -1));
         }
 }
