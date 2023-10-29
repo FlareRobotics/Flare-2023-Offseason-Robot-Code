@@ -42,6 +42,7 @@ public class RobotContainer {
 
         public static XboxController driver_main = new XboxController(1);
         public static XboxController driver_2 = new XboxController(2);
+
         private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
         private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
         private static final CompressorSubsystem compressorSubsystem = new CompressorSubsystem();
@@ -59,10 +60,32 @@ public class RobotContainer {
         public RobotContainer() {
                 configureButtonBindings();
 
-                autoChooser.setDefaultOption("No Auto", 0);
-                autoChooser.addOption("Only Cube", 1);
-                autoChooser.addOption("Cube + Mobility", 2);
-                autoChooser.addOption("Cube + Mobility + Balance", 3);
+
+                // BN = Blue Normal, BB = Blue bump
+                autoChooser.addOption("BN Cube Mobility", 0);
+                autoChooser.addOption("BN Cube Mobility Balance ", 1);
+                autoChooser.addOption("BB Cube Mobility", 2);
+
+                autoChooser.addOption("RN Cube Mobility", 3);
+                autoChooser.addOption("RN Cube Mobility Balance", 4);
+                autoChooser.addOption("RB Cube Mobility", 5);
+
+                autoChooser.addOption("Middle Cube Balance", 6);
+
+                autoChooser.setDefaultOption("No Auto", 7);
+                autoChooser.addOption("Only Cube", 8);
+
+                // To use when we have a subsystem error, only chassis are used down below(Leave commented until needed)
+                /*
+                autoChooser.addOption("BN Mobility", 9);
+                autoChooser.addOption("BN Mobility Balance ", 10);
+                autoChooser.addOption("BB Mobility", 11);
+
+                autoChooser.addOption("RN Mobility", 12);
+                autoChooser.addOption("RN Mobility Balance", 13);
+                autoChooser.addOption("RB Mobility", 14);
+                */
+                
                 SmartDashboard.putData(autoChooser);
 
                 ledSubsystem.setDefaultCommand(new LedController(ledSubsystem));
@@ -85,6 +108,10 @@ public class RobotContainer {
         }
 
         private void configureButtonBindings() {
+                // Reset Heading for Field Relative
+                new JoystickButton(driver_main,XboxController.Button.kLeftBumper.value)
+                                .whileTrue(new RunCommand(()-> m_robotDrive.m_gyro.setYaw(0)));
+                                
                 // Manuel Elevator
                 new JoystickButton(driver_2, 8)
                                 .whileTrue(new ManuelElevator(elevatorsubsystem, true));
