@@ -25,6 +25,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 
 //File Imports
 import frc.lib.math.Conversions;
+import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.ModuleConstants;
 
 public class MAXSwerveModule {
@@ -104,7 +105,6 @@ public class MAXSwerveModule {
     m_turningPIDController.setOutputRange(ModuleConstants.kTurningMinOutput,
         ModuleConstants.kTurningMaxOutput);
 
-        
     m_turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
     // No current limit is set for driving motor
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
@@ -116,8 +116,6 @@ public class MAXSwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_drivingTalon.setSelectedSensorPosition(0);
 
-    m_turningPIDController.setReference( m_chassisAngularOffset,
-        CANSparkMax.ControlType.kPosition);
   }
 
   /**
@@ -131,7 +129,7 @@ public class MAXSwerveModule {
     return new SwerveModuleState(
         Conversions.falconToMPS(m_drivingTalon.getSelectedSensorVelocity(), ModuleConstants.kWheelCircumferenceMeters,
             ModuleConstants.kDrivingMotorReduction),
-        new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
+        new Rotation2d(m_turningEncoder.getPosition() + m_chassisAngularOffset));
   }
 
   /**
@@ -152,27 +150,67 @@ public class MAXSwerveModule {
    *
    * @param desiredState Desired state with speed and angle.
    */
+
+  SwerveModuleState lastState;
+
+  public static SwerveModuleState optimize(
+      SwerveModuleState desiredState, Rotation2d currentAngle) {
+    double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
+    double targetSpeed = desiredState.speedMetersPerSecond;
+    double delta = targetAngle - currentAngle.getDegrees();
+    if (Math.abs(delta) > 90) {
+      targetSpeed = -targetSpeed;
+      targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
+    }
+    return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+  }
+
+  /**
+   * @param scopeReference Current Angle
+   * @param newAngle       Target Angle
+   * @return Closest angle within scope
+   */
+  private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    double lowerBound;
+    double upperBound;
+    double lowerOffset = scopeReference % 360;
+    if (lowerOffset >= 0) {
+      lowerBound = scopeReference - lowerOffset;
+      upperBound = scopeReference + (360 - lowerOffset);
+    } else {
+      upperBound = scopeReference - lowerOffset;
+      lowerBound = scopeReference - (360 + lowerOffset);
+    }
+    while (newAngle < lowerBound) {
+      newAngle += 360;
+    }
+    while (newAngle > upperBound) {
+      newAngle -= 360;
+    }
+    if (newAngle - scopeReference > 180) {
+      newAngle -= 360;
+    } else if (newAngle - scopeReference < -180) {
+      newAngle += 360;
+    }
+    return newAngle;
+  }
+
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
 
-    if (Math.abs(desiredState.speedMetersPerSecond) < 0.01) {
-      stop();
-      return;
+    if (Math.abs(desiredState.speedMetersPerSecond) < SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond * 0.006) {
+      desiredState.angle = getState().angle;
     }
 
-    SwerveModuleState optiSwerveModuleState = SwerveModuleState.optimize(desiredState, Rotation2d.fromRadians(m_turningEncoder.getPosition() > 6.23 ? 0 :  m_turningEncoder.getPosition()));
+    desiredState = optimize(desiredState,
+        Rotation2d.fromRadians(m_turningEncoder.getPosition() + m_chassisAngularOffset));
     // Command driving and turning SPARKS MAX towards their respective setpoints.
 
     // Apply chassis angular offset to the desired state.
     // Set speed of Falcon
-    setSpeed(optiSwerveModuleState, isOpenLoop);
+    setSpeed(desiredState, isOpenLoop);
 
-    m_turningPIDController.setReference(optiSwerveModuleState.angle.getRadians() + m_chassisAngularOffset,
+    m_turningPIDController.setReference(desiredState.angle.getRadians() - m_chassisAngularOffset,
         CANSparkMax.ControlType.kPosition);
-  }
-
-  public void stop() {
-    m_drivingTalon.set(ControlMode.PercentOutput, 0);
-    m_turningSparkMax.set(0);
   }
 
   /** Zeroes all the SwerveModule encoders. */
@@ -186,7 +224,7 @@ public class MAXSwerveModule {
    * @return Motor position in meters.
    */
   public double getDriveMotorPosition() {
-    return Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(),
+    return -Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(),
         ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
   }
 
