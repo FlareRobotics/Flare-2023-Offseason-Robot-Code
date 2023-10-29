@@ -96,10 +96,6 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
 
-    SmartDashboard.putString("m_frontLeft",  m_frontLeft.getPosition().toString());
-    SmartDashboard.putString("m_frontRight",  m_frontRight.getPosition().toString());
-    SmartDashboard.putString("m_rearLeft",  m_rearLeft.getPosition().toString());
-    SmartDashboard.putString("m_rearRight",  m_rearRight.getPosition().toString());
 
 
     mField2d.setRobotPose(m_odometry.getPoseMeters());
@@ -108,15 +104,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     SmartDashboard.putNumber("Gyro angle", m_gyro.getYaw());
     
-    SmartDashboard.putNumber("FL Angle Degrees", m_frontLeft.getPosition().angle.getDegrees());
-    SmartDashboard.putNumber("FR Angle Degrees", m_frontRight.getPosition().angle.getDegrees());
-    SmartDashboard.putNumber("BL Angle Degrees", m_rearLeft.getPosition().angle.getDegrees());
-    SmartDashboard.putNumber("BR Angle Degrees", m_rearRight.getPosition().angle.getDegrees());
 
-    SmartDashboard.putNumber("FL Drive Meters", m_frontLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("FR Drive Meters", m_frontRight.getPosition().distanceMeters);
-    SmartDashboard.putNumber("BL Drive Meters", m_rearLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("BR Drive Meters", m_rearRight.getPosition().distanceMeters);
   }
 
   /**

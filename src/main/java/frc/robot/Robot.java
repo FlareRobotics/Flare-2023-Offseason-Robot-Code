@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    DriveSubsystem.setBrake(false);
+    DriveSubsystem.setBrake(true);
     DriveSubsystem.zeroHeading();
     DriveSubsystem.resetEncoders();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();

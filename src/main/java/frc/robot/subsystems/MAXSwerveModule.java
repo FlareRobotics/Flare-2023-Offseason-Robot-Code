@@ -224,7 +224,7 @@ public class MAXSwerveModule {
    * @return Motor position in meters.
    */
   public double getDriveMotorPosition() {
-    return -Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(),
+    return Conversions.falconToMeters(m_drivingTalon.getSelectedSensorPosition(),
         ModuleConstants.kWheelCircumferenceMeters, ModuleConstants.kDrivingMotorReduction);
   }
 

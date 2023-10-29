@@ -175,9 +175,19 @@ public class RobotContainer {
                 //         new BackPigeon(m_robotDrive, -3),
                 //         new ClimbPigeon(m_robotDrive, -1));
 
-                PathPlannerTrajectory traj = PathPlanner.loadPath("Test", new PathConstraints(2, 1));
+
+                PathPlannerTrajectory traj = PathPlanner.loadPath("2MC", new PathConstraints(3, 2));
                 m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                return getTraj(traj);
+                return new SequentialCommandGroup(
+                         new ParallelCommandGroup(
+                                 new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
+                                 new SequentialCommandGroup(
+                                         new WaitCommand(.5),
+                                         new AutoArm(armSubsystem, Distance_State.Middle_Cube_Arm))),
+                         new ClawSet(clawSubsystem).withTimeout(0.5d),
+                         new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
+                         new AutoElevator(elevatorsubsystem, Distance_State.Zero_All))).andThen(getTraj(traj));
+
         }
 
         private PPSwerveControllerCommand getTraj(PathPlannerTrajectory trajectory)
