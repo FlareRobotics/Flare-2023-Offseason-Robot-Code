@@ -50,6 +50,6 @@ public class ClimbPigeon extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return DriveSubsystem.m_gyro.getPitch() < 3;
+    return DriveSubsystem.m_gyro.getPitch() < 4.5d;
   }
 }

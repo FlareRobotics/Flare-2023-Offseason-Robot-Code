@@ -47,6 +47,6 @@ public class BackPigeon extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return DriveSubsystem.m_gyro.getPitch() > 10;
+    return DriveSubsystem.m_gyro.getPitch() > 6.5d;
   }
 }
