@@ -175,7 +175,7 @@ public class RobotContainer {
                 //         new BackPigeon(m_robotDrive, -3),
                 //         new ClimbPigeon(m_robotDrive, -1));
 
-                PathPlannerTrajectory traj = PathPlanner.loadPath("Test", new PathConstraints(2, 2));
+                PathPlannerTrajectory traj = PathPlanner.loadPath("Test", new PathConstraints(2, 1));
                 m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                 return getTraj(traj);
         }
