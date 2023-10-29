@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 //CTRE Imports
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -214,6 +215,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
   }
 
+  public static void setBrake(boolean enabled)
+  {
+    m_frontLeft.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
+    m_frontRight.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
+    m_rearLeft.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
+    m_rearRight.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
+  }
   /**
    * Sets the wheels into an X formation to prevent movement.
    */

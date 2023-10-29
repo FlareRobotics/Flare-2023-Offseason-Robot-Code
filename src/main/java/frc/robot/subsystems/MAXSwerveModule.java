@@ -29,7 +29,7 @@ import frc.robot.SwerveConstants.ModuleConstants;
 
 public class MAXSwerveModule {
 
-  private final TalonFX m_drivingTalon;
+  public final TalonFX m_drivingTalon;
   private final CANSparkMax m_turningSparkMax;
 
   private final AbsoluteEncoder m_turningEncoder;
@@ -104,7 +104,7 @@ public class MAXSwerveModule {
     m_turningPIDController.setOutputRange(ModuleConstants.kTurningMinOutput,
         ModuleConstants.kTurningMaxOutput);
 
-    m_drivingTalon.setNeutralMode(ModuleConstants.kDrivingMotorNeutralMode);
+        
     m_turningSparkMax.setIdleMode(ModuleConstants.kTurningMotorIdleMode);
     // No current limit is set for driving motor
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);

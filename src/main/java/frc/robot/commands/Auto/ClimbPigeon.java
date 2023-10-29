@@ -3,6 +3,7 @@ package frc.robot.commands.Auto;
 
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -25,7 +26,9 @@ public class ClimbPigeon extends CommandBase {
   @Override
   public void execute() {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-      new ChassisSpeeds(0, mps, 0));
+      ChassisSpeeds.fromFieldRelativeSpeeds(0, mps, 0,
+                Rotation2d.fromDegrees(DriveSubsystem.m_gyro.getYaw())));
+
   SwerveDriveKinematics.desaturateWheelSpeeds(
       swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
   DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
@@ -46,6 +49,7 @@ public class ClimbPigeon extends CommandBase {
   DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
 
   subsystem.setX();
+  DriveSubsystem.setBrake(true);
   }
 
   @Override
