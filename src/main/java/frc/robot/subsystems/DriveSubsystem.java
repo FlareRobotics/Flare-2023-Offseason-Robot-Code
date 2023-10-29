@@ -70,7 +70,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      }, new Pose2d(3, 3, Rotation2d.fromDegrees(m_gyro.getYaw())));
+      }, new Pose2d(1.95d, 3.3d, Rotation2d.fromDegrees(m_gyro.getYaw())));
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
