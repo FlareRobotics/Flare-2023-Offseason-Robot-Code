@@ -69,9 +69,9 @@ public final class SwerveConstants {
 
   public static final class ModuleConstants {
     // Constants for Feedforward from SYSID
-    public static final double kS = 0.0;
-    public static final double kV = 0.0;
-    public static final double kA = 0.0;
+    public static final double kS = 0.034;
+    public static final double kV = 0.3;
+    public static final double kA = 0.018;
     // The MAXSwerve module can be configured with one of three pinion gears: 12T,
     // 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth

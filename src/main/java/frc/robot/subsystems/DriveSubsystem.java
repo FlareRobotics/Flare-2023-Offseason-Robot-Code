@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 //CTRE Imports
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -57,6 +59,10 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_magYLimiter = new SlewRateLimiter(DriveConstants.kMaxAcceleration);
 
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kMaxAngularAcceleration);
+
+  public PIDController xController = new PIDController(SwerveConstants.AutoConstants.kPXController, 0, 0);
+  public PIDController yController = new PIDController(SwerveConstants.AutoConstants.kPYController, 0, 0);
+  public PIDController thetaController = new PIDController(SwerveConstants.AutoConstants.kPThetaController, 0, 0);
 
 
   // Odometry class for tracking robot pose
@@ -177,6 +183,17 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(swerveModuleStates[1], isOpenLoop);
     m_rearLeft.setDesiredState(swerveModuleStates[2], isOpenLoop);
     m_rearRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
+  }
+
+  public void setSpeeds(ChassisSpeeds speeds)
+  {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+    m_frontRight.setDesiredState(swerveModuleStates[1], true);
+    m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+    m_rearRight.setDesiredState(swerveModuleStates[3], true);
   }
 
   public static void setBrake(boolean enabled)
