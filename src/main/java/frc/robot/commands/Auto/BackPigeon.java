@@ -27,10 +27,10 @@ public class BackPigeon extends CommandBase {
       new ChassisSpeeds(0, mps, 0));
   SwerveDriveKinematics.desaturateWheelSpeeds(
       swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-  DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], false);
-  DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], false);
-  DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], false);
-  DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], false);
+  DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+  DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
+  DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+  DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
   }
 
   @Override
