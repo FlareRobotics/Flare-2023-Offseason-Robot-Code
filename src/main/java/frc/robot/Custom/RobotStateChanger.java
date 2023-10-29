@@ -1,6 +1,7 @@
 package frc.robot.Custom;
 
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RobotStateChanger extends CommandBase {
@@ -20,6 +21,7 @@ public class RobotStateChanger extends CommandBase {
                 break;
             case 1:
                 RobotContainer.currentState = RobotState.Balanced;
+                DriveSubsystem.setX();
                 break;
             case 2:
                 RobotContainer.currentState = RobotState.NotBalanced;

@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ClimbPigeon extends CommandBase {
 
-  int mps;
+  double mps;
   DriveSubsystem subsystem;
-  public ClimbPigeon(DriveSubsystem driveSubsystem, int MPS) {
+  public ClimbPigeon(DriveSubsystem driveSubsystem, double MPS) {
     subsystem = driveSubsystem;
     mps = MPS;
     addRequirements(driveSubsystem);
@@ -48,7 +48,6 @@ public class ClimbPigeon extends CommandBase {
   DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
   DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
 
-  subsystem.setX();
   DriveSubsystem.setBrake(true);
   }
 
