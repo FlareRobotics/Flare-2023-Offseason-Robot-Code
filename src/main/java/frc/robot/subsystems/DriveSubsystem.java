@@ -31,19 +31,19 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kFrontLeftChassisAngularOffset,
       false, true);
 
-      public static final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  public static final MAXSwerveModule m_frontRight = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset,
       false, true);
 
-      public static final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  public static final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset,
       false, true);
 
-      public static final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  public static final MAXSwerveModule m_rearRight = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset,
@@ -53,7 +53,6 @@ public class DriveSubsystem extends SubsystemBase {
   public static final Pigeon2 m_gyro = new Pigeon2(DriveConstants.gyroCanId);
 
   // Slew rate filter variables for controlling lateral acceleration
-
 
   private SlewRateLimiter m_magXLimiter = new SlewRateLimiter(DriveConstants.kMaxAcceleration);
   private SlewRateLimiter m_magYLimiter = new SlewRateLimiter(DriveConstants.kMaxAcceleration);
@@ -66,6 +65,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public static double shifterReduction = 1;
 
+  public static boolean teleopPlaying = false;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -88,24 +88,25 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getYaw()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
 
+    if (!teleopPlaying) {
+      // Update the odometry in the periodic block
+      m_odometry.update(
+          Rotation2d.fromDegrees(m_gyro.getYaw()),
+          new SwerveModulePosition[] {
+              m_frontLeft.getPosition(),
+              m_frontRight.getPosition(),
+              m_rearLeft.getPosition(),
+              m_rearRight.getPosition()
+          });
 
+      mField2d.setRobotPose(m_odometry.getPoseMeters());
 
-    mField2d.setRobotPose(m_odometry.getPoseMeters());
+      SmartDashboard.putData(mField2d);
+      SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+    }
 
-    SmartDashboard.putData(mField2d);
-    SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     SmartDashboard.putNumber("Gyro angle", m_gyro.getYaw());
-    
 
   }
 
@@ -150,19 +151,15 @@ public class DriveSubsystem extends SubsystemBase {
 
     double xSpeedDelivered, ySpeedDelivered, rotDelivered;
 
-
     xSpeed /= shifterReduction;
     ySpeed /= shifterReduction;
     rot /= shifterReduction;
-    if(rateLimit)
-    {
-    // Convert the commanded speeds into the correct units for the drivetrain
-     xSpeedDelivered = m_magXLimiter.calculate(xSpeed) * DriveConstants.kMaxSpeedMetersPerSecond;
-     ySpeedDelivered = m_magYLimiter.calculate(ySpeed) * DriveConstants.kMaxSpeedMetersPerSecond;
-     rotDelivered = m_rotLimiter.calculate(rot) * DriveConstants.kMaxAngularSpeed;
-    }
-    else
-    {
+    if (rateLimit) {
+      // Convert the commanded speeds into the correct units for the drivetrain
+      xSpeedDelivered = m_magXLimiter.calculate(xSpeed) * DriveConstants.kMaxSpeedMetersPerSecond;
+      ySpeedDelivered = m_magYLimiter.calculate(ySpeed) * DriveConstants.kMaxSpeedMetersPerSecond;
+      rotDelivered = m_rotLimiter.calculate(rot) * DriveConstants.kMaxAngularSpeed;
+    } else {
       xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
       ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
       rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
@@ -180,8 +177,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
   }
 
-  public void setSpeeds(ChassisSpeeds speeds)
-  {
+  public void setSpeeds(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -191,13 +187,13 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3], true);
   }
 
-  public static void setBrake(boolean enabled)
-  {
+  public static void setBrake(boolean enabled) {
     m_frontLeft.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
     m_frontRight.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
     m_rearLeft.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
     m_rearRight.m_drivingTalon.setNeutralMode(enabled ? NeutralMode.Brake : NeutralMode.Coast);
   }
+
   /**
    * Sets the wheels into an X formation to prevent movement.
    */

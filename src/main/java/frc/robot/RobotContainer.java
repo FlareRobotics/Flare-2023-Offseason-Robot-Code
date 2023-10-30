@@ -24,7 +24,6 @@ import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.commands.Arm.AutoArm;
 import frc.robot.commands.Arm.ManuelArm;
 import frc.robot.commands.Auto.ClimbPigeon;
-import frc.robot.commands.Auto.Shifter;
 import frc.robot.commands.Claw.ClawSet;
 import frc.robot.commands.Claw.ToggleCompressor;
 import frc.robot.commands.Elevator.AutoElevator;
@@ -101,7 +100,10 @@ public class RobotContainer {
                                 
                 //Shifter
                 new JoystickButton(driver_main, XboxController.Axis.kLeftTrigger.value)
-                .whileTrue(new Shifter(m_robotDrive, 2));
+                .whileTrue(new RunCommand(() -> DriveSubsystem.shifterReduction = 2));
+
+                new JoystickButton(driver_main, XboxController.Axis.kLeftTrigger.value)
+                .onFalse(new RunCommand(() -> DriveSubsystem.shifterReduction = 1));
 
                 // Manuel Elevator
                 new JoystickButton(driver_2, 8)
@@ -125,6 +127,7 @@ public class RobotContainer {
 
                 // Wanted Status
                 new JoystickButton(driver_2, 5).toggleOnTrue(new SupplyGather(ledSubsystem));
+
                 // Reset Encoders
                 new JoystickButton(driver_2, 9)
                                 .whileTrue(new ResetRobot(armSubsystem, elevatorsubsystem, clawSubsystem));
@@ -132,7 +135,7 @@ public class RobotContainer {
                 // Led Close
                 new JoystickButton(driver_2, 11).whileTrue(new RobotStateChanger(0));
 
-                // Substation Test
+                // Substation 
                 new JoystickButton(driver_2, 6).toggleOnTrue(
                                 new ParallelCommandGroup(
                                                 new AutoElevator(elevatorsubsystem, Distance_State.Substation_Elevator),
@@ -140,24 +143,28 @@ public class RobotContainer {
                                                                 new AutoArm(armSubsystem,
                                                                                 Distance_State.Substation_Arm))));
 
+                // Cube Teleop?
                 new JoystickButton(driver_2, 1).toggleOnTrue(new ParallelCommandGroup(
                                 new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cube_Elevator),
                                 new SequentialCommandGroup(
                                                 new WaitCommand(.5),
                                                 new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
 
+                // Koni teleop?
                 new JoystickButton(driver_2, 4).toggleOnTrue(new ParallelCommandGroup(
                                 new AutoElevator(elevatorsubsystem, Distance_State.Middle_Cone_Elevator_Auto),
                                 new SequentialCommandGroup(
                                                 new WaitCommand(.5),
                                                 new AutoArm(armSubsystem, Distance_State.Middle_Cone_Arm))));
 
+                // Reset Arm And Elevator
                 new JoystickButton(driver_2, 2).toggleOnTrue(new ParallelCommandGroup(
                                 new AutoArm(armSubsystem, Distance_State.Zero_All),
                                 new SequentialCommandGroup(
                                                 new WaitCommand(.8),
                                                 new AutoElevator(elevatorsubsystem, Distance_State.Zero_All))));
 
+                // Reset arm only
                 new JoystickButton(driver_2, 3).toggleOnTrue(new AutoArm(armSubsystem, Distance_State.Zero_All));
 
 
