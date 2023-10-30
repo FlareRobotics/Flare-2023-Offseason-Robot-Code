@@ -64,6 +64,8 @@ public class DriveSubsystem extends SubsystemBase {
   public PIDController yController = new PIDController(SwerveConstants.AutoConstants.kPYController, 0, 0);
   public PIDController thetaController = new PIDController(SwerveConstants.AutoConstants.kPThetaController, 0, 0);
 
+  public static double shifterReduction = 1;
+
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -147,6 +149,11 @@ public class DriveSubsystem extends SubsystemBase {
       boolean isOpenLoop) {
 
     double xSpeedDelivered, ySpeedDelivered, rotDelivered;
+
+
+    xSpeed /= shifterReduction;
+    ySpeed /= shifterReduction;
+    rot /= shifterReduction;
     if(rateLimit)
     {
     // Convert the commanded speeds into the correct units for the drivetrain

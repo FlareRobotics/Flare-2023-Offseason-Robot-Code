@@ -24,6 +24,7 @@ import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.commands.Arm.AutoArm;
 import frc.robot.commands.Arm.ManuelArm;
 import frc.robot.commands.Auto.ClimbPigeon;
+import frc.robot.commands.Auto.Shifter;
 import frc.robot.commands.Claw.ClawSet;
 import frc.robot.commands.Claw.ToggleCompressor;
 import frc.robot.commands.Elevator.AutoElevator;
@@ -54,11 +55,10 @@ public class RobotContainer {
         public static boolean clawOpen = true;
         public static RobotState currentState = RobotState.None;
         public static boolean wantedCone = false;
-        public float turn_rate = 2.0f;
+
 
         public RobotContainer() {
                 configureButtonBindings();
-
 
                 // BN = Blue Normal, BB = Blue bump
                 autoChooser.addOption("BN Cube Mobility", 0);
@@ -73,17 +73,6 @@ public class RobotContainer {
 
                 autoChooser.addOption("Only Cube", 7);
 
-                // To use when we have a subsystem error, only chassis are used down below(Leave commented until needed)
-                /*
-                autoChooser.addOption("BN Mobility", 9);
-                autoChooser.addOption("BN Mobility Balance ", 10);
-                autoChooser.addOption("BB Mobility", 11);
-
-                autoChooser.addOption("RN Mobility", 12);
-                autoChooser.addOption("RN Mobility Balance", 13);
-                autoChooser.addOption("RB Mobility", 14);
-                */
-                
                 SmartDashboard.putData(autoChooser);
 
                 ledSubsystem.setDefaultCommand(new LedController(ledSubsystem));
@@ -107,9 +96,13 @@ public class RobotContainer {
 
         private void configureButtonBindings() {
                 // Reset Heading for Field Relative
-                new JoystickButton(driver_main,XboxController.Button.kLeftBumper.value)
-                                .whileTrue(new RunCommand(()-> DriveSubsystem.m_gyro.setYaw(0)));
+                new JoystickButton(driver_main, XboxController.Button.kLeftBumper.value)
+                                .whileTrue(new RunCommand(() -> DriveSubsystem.m_gyro.setYaw(0)));
                                 
+                //Shifter
+                new JoystickButton(driver_main, XboxController.Button.kLeftStick.value)
+                .toggleOnTrue(new Shifter(m_robotDrive, 2));
+
                 // Manuel Elevator
                 new JoystickButton(driver_2, 8)
                                 .whileTrue(new ManuelElevator(elevatorsubsystem, true));
@@ -167,10 +160,6 @@ public class RobotContainer {
 
                 new JoystickButton(driver_2, 3).toggleOnTrue(new AutoArm(armSubsystem, Distance_State.Zero_All));
 
-                new JoystickButton(driver_main, XboxController.Button.kLeftStick.value)
-                                .whileTrue(new RunCommand(() -> turn_rate = 2.8f));
-                new JoystickButton(driver_main, XboxController.Button.kRightStick.value)
-                                .whileTrue(new RunCommand(() -> turn_rate = 2.0f));
 
         }
 
@@ -178,125 +167,61 @@ public class RobotContainer {
 
                 if (autoChooser.getSelected().equals(7)) // Cube only
                 {
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(new RobotStateChanger(1));
-                }
+                } 
                 else if (autoChooser.getSelected().equals(0)) // Blue Normal Mobility
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Normal_Mobility", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Normal_Mobility",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj)
-                                        .andThen(new RobotStateChanger(1)));
-                }
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
                 else if (autoChooser.getSelected().equals(2)) // Blue Bump Mobility
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Bump_Mobility", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Bump_Mobility",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj)
-                                        .andThen(new RobotStateChanger(1)));
-                }
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
                 else if (autoChooser.getSelected().equals(1)) // Cube + Mobility + Balance
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Normal_MobilityBalance", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Normal_MobilityBalance",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj))
                                         .andThen(new ClimbPigeon(m_robotDrive, -0.5))
                                         .andThen(new RobotStateChanger(1));
-                }
+                } 
                 else if (autoChooser.getSelected().equals(3)) // Red Normal Mobility
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Normal_Mobility", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Normal_Mobility",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj)
-                                        .andThen(new RobotStateChanger(1)));
-                }
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
                 else if (autoChooser.getSelected().equals(5)) // Red Bump Mobility
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Bump_Mobility", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Bump_Mobility",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj)
-                                        .andThen(new RobotStateChanger(1)));
-                }
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
                 else if (autoChooser.getSelected().equals(4)) // Red + Mobility + Balance
                 {
-                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Normal_MobilityBalance", new PathConstraints(4, 3));
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Normal_MobilityBalance",
+                                        new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
-                        return new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                        new AutoElevator(elevatorsubsystem,
-                                                                        Distance_State.Middle_Cube_Elevator),
-                                                        new SequentialCommandGroup(
-                                                                        new WaitCommand(.5),
-                                                                        new AutoArm(armSubsystem,
-                                                                                        Distance_State.Middle_Cube_Arm))),
-                                        new ClawSet(clawSubsystem).withTimeout(0.5d),
-                                        new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
-                                                        new AutoElevator(elevatorsubsystem, Distance_State.Zero_All).beforeStarting(new WaitCommand(0.5d))))
+                        return placeCubeCommand()
                                         .andThen(getTraj(traj))
                                         .andThen(new ClimbPigeon(m_robotDrive, -0.5))
                                         .andThen(new RobotStateChanger(1));
@@ -312,5 +237,20 @@ public class RobotContainer {
                                 m_robotDrive::setSpeeds, m_robotDrive);
 
                 return command;
+        }
+
+        private Command placeCubeCommand() {
+                return new SequentialCommandGroup(
+                                new ParallelCommandGroup(
+                                                new AutoElevator(elevatorsubsystem,
+                                                                Distance_State.Middle_Cube_Elevator),
+                                                new SequentialCommandGroup(
+                                                                new WaitCommand(.5),
+                                                                new AutoArm(armSubsystem,
+                                                                                Distance_State.Middle_Cube_Arm))),
+                                new ClawSet(clawSubsystem).withTimeout(0.5d),
+                                new ParallelCommandGroup(new AutoArm(armSubsystem, Distance_State.Zero_All),
+                                                new AutoElevator(elevatorsubsystem, Distance_State.Zero_All)
+                                                                .beforeStarting(new WaitCommand(0.5d))));
         }
 }
