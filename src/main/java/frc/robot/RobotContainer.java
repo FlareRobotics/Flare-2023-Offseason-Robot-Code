@@ -100,8 +100,8 @@ public class RobotContainer {
                                 .whileTrue(new RunCommand(() -> DriveSubsystem.m_gyro.setYaw(0)));
                                 
                 //Shifter
-                new JoystickButton(driver_main, XboxController.Button.kLeftStick.value)
-                .toggleOnTrue(new Shifter(m_robotDrive, 2));
+                new JoystickButton(driver_main, XboxController.Axis.kLeftTrigger.value)
+                .whileTrue(new Shifter(m_robotDrive, 2));
 
                 // Manuel Elevator
                 new JoystickButton(driver_2, 8)
