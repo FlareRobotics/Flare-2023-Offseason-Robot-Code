@@ -197,6 +197,24 @@ public class RobotContainer {
                                         .andThen(getTraj(traj)
                                                         .andThen(new RobotStateChanger(1)));
                 } 
+                else if (autoChooser.getSelected().equals(8)) // Blue Bump Mobility Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Bump_MobilityBalance",
+                                        new PathConstraints(4, 3));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
+                else if (autoChooser.getSelected().equals(9)) // Red Bump Mobility Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Bump_MobilityBalance",
+                                        new PathConstraints(4, 3));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
                 else if (autoChooser.getSelected().equals(1)) // Cube + Mobility + Balance
                 {
                         PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Normal_MobilityBalance",
