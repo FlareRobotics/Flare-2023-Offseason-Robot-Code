@@ -63,10 +63,12 @@ public class RobotContainer {
                 autoChooser.addOption("BN Cube Mobility", 0);
                 autoChooser.addOption("BN Cube Mobility Balance ", 1);
                 autoChooser.addOption("BB Cube Mobility", 2);
+                autoChooser.addOption("BB Cube Mobility Balance", 8);
 
                 autoChooser.addOption("RN Cube Mobility", 3);
                 autoChooser.addOption("RN Cube Mobility Balance", 4);
                 autoChooser.addOption("RB Cube Mobility", 5);
+                autoChooser.addOption("RB Cube Mobility Balance", 9);
 
                 autoChooser.setDefaultOption("No Auto", 6);
 
