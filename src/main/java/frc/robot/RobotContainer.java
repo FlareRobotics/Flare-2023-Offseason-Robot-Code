@@ -70,6 +70,9 @@ public class RobotContainer {
                 autoChooser.addOption("RB Cube Mobility", 5);
                 autoChooser.addOption("RB Cube Mobility Balance", 9);
 
+                autoChooser.addOption("RM Cube Balance", 10);
+                autoChooser.addOption("BM Cube Balance", 11);
+
                 autoChooser.setDefaultOption("No Auto", 6);
 
                 autoChooser.addOption("Only Cube", 7);
@@ -200,6 +203,24 @@ public class RobotContainer {
                 else if (autoChooser.getSelected().equals(8)) // Blue Bump Mobility Balance
                 {
                         PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Bump_MobilityBalance",
+                                        new PathConstraints(4, 3));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
+                else if (autoChooser.getSelected().equals(10)) // Red Middle Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Middle_Balance",
+                                        new PathConstraints(4, 3));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
+                else if (autoChooser.getSelected().equals(11)) // Blue Middle Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Middle_Balance",
                                         new PathConstraints(4, 3));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
