@@ -89,16 +89,17 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
+     // Update the odometry in the periodic block
+     m_odometry.update(
+      Rotation2d.fromDegrees(m_gyro.getYaw()),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      });
     if (!teleopPlaying) {
-      // Update the odometry in the periodic block
-      m_odometry.update(
-          Rotation2d.fromDegrees(m_gyro.getYaw()),
-          new SwerveModulePosition[] {
-              m_frontLeft.getPosition(),
-              m_frontRight.getPosition(),
-              m_rearLeft.getPosition(),
-              m_rearRight.getPosition()
-          });
+     
 
       mField2d.setRobotPose(m_odometry.getPoseMeters());
 
@@ -167,7 +168,7 @@ public class DriveSubsystem extends SubsystemBase {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(m_gyro.getYaw()))
+                Rotation2d.fromDegrees(m_gyro.getYaw() + 180))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);

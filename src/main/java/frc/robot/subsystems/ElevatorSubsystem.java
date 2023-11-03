@@ -76,7 +76,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
                 /* Set acceleration and vcruise velocity - see documentation */
                 elevator_motor.configMotionCruiseVelocity(15000, PidConstants.TurretConstants.kTimeoutMs);
-                elevator_motor.configMotionAcceleration(18000, PidConstants.TurretConstants.kTimeoutMs);
+                elevator_motor.configMotionAcceleration(27000, PidConstants.TurretConstants.kTimeoutMs);
 
                 /* Zero the sensor once on robot boot up */
                 elevator_motor.setSelectedSensorPosition(0, PidConstants.TurretConstants.kPIDLoopIdx,
