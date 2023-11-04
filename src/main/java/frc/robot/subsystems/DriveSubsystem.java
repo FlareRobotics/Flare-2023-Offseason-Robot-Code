@@ -17,8 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -84,10 +82,12 @@ public class DriveSubsystem extends SubsystemBase {
     zeroHeading();
   }
 
-  private final Field2d mField2d = new Field2d();
 
   @Override
   public void periodic() {
+
+    if(teleopPlaying)
+    return;
 
      // Update the odometry in the periodic block
      m_odometry.update(
@@ -98,17 +98,6 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
       });
-    if (!teleopPlaying) {
-     
-
-      mField2d.setRobotPose(m_odometry.getPoseMeters());
-
-      SmartDashboard.putData(mField2d);
-      SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
-    }
-
-    SmartDashboard.putNumber("Gyro angle", m_gyro.getYaw());
-
   }
 
   /**

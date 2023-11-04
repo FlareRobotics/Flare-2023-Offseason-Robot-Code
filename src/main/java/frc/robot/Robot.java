@@ -76,6 +76,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    DriveSubsystem.teleopPlaying = false;
     DriveSubsystem.setBrake(true);
     DriveSubsystem.zeroHeading();
     DriveSubsystem.resetEncoders();
