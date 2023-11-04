@@ -89,9 +89,9 @@ public class RobotContainer {
                                 new RunCommand(
                                                 () -> m_robotDrive.drive(
                                                                 -MathUtil.applyDeadband(driver_main.getLeftY(),
-                                                                                OIConstants.kDriveDeadband) / 1.25d,
+                                                                                OIConstants.kDriveDeadband) / 1.00d,
                                                                 -MathUtil.applyDeadband(driver_main.getLeftX(),
-                                                                                OIConstants.kDriveDeadband) / 1.25d,
+                                                                                OIConstants.kDriveDeadband) / 1.00d,
                                                                 -MathUtil.applyDeadband(driver_main.getRightX(),
                                                                                 OIConstants.kDriveDeadband) / 2,
                                                                 true, true, true),
@@ -104,10 +104,10 @@ public class RobotContainer {
                                 .whileTrue(new RunCommand(() -> DriveSubsystem.m_gyro.setYaw(0)));
                                 
                 //Shifter
-                new JoystickButton(driver_main, XboxController.Axis.kLeftTrigger.value)
+                new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
                 .whileTrue(new RunCommand(() -> DriveSubsystem.shifterReduction = 2));
 
-                new JoystickButton(driver_main, XboxController.Axis.kLeftTrigger.value)
+                new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
                 .onFalse(new RunCommand(() -> DriveSubsystem.shifterReduction = 1));
 
                 // Manuel Elevator
