@@ -23,6 +23,7 @@ import frc.robot.Custom.SupplyGather;
 import frc.robot.SwerveConstants.OIConstants;
 import frc.robot.commands.Arm.AutoArm;
 import frc.robot.commands.Arm.ManuelArm;
+import frc.robot.commands.Auto.AutoAlign;
 import frc.robot.commands.Auto.ClimbPigeon;
 import frc.robot.commands.Claw.ClawSet;
 import frc.robot.commands.Claw.ToggleCompressor;
@@ -99,9 +100,9 @@ public class RobotContainer {
         }
 
         private void configureButtonBindings() {
-                // Reset Heading for Field Relative
+                // Auto Align
                 new JoystickButton(driver_main, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(new RunCommand(() -> DriveSubsystem.m_gyro.setYaw(0)));
+                                .whileTrue(new AutoAlign(m_robotDrive));
                                 
                 //Shifter
                 new JoystickButton(driver_main, XboxController.Button.kRightBumper.value)
