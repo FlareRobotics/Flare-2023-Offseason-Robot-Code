@@ -29,6 +29,7 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public void initialize() {
+    FlareVisionSubsystem.ledSpx.set(1);
   }
 
   @Override
@@ -63,6 +64,7 @@ public class AutoAlign extends CommandBase {
     DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
     DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
     DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
+    FlareVisionSubsystem.ledSpx.set(0);
   }
 
   @Override
