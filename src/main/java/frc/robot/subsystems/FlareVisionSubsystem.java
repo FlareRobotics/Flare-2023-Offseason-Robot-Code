@@ -4,36 +4,25 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-
+import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FlareVisionSubsystem extends SubsystemBase {
 
   public static PhotonCamera camera;
-  public static WPI_VictorSPX ledSpx = new WPI_VictorSPX(8);
+  public static VictorSP ledSpx = new VictorSP(5);
 
   public FlareVisionSubsystem()
   {
     camera = new PhotonCamera("Camera");
-    FlareVisionSubsystem.ledSpx.set(0);
   }
 
   
 
   @Override
   public void periodic() {
-    camera = new PhotonCamera("Camera");
-    if(camera.getLatestResult() != null)
-    {
-      SmartDashboard.putBoolean("Has Targets", camera.getLatestResult().hasTargets());
-      if(camera.getLatestResult().hasTargets())
-      {
-        SmartDashboard.putNumber("X Camera", camera.getLatestResult().getBestTarget().getYaw());
-        SmartDashboard.putNumber("Y Camera", camera.getLatestResult().getBestTarget().getPitch());
-      }
-    }
+    
   }
 
   public static PhotonTrackedTarget getBestTarget() {

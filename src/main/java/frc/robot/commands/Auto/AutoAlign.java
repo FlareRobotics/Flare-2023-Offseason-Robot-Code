@@ -14,9 +14,9 @@ public class AutoAlign extends CommandBase {
   /** Creates a new AutoAlign. */
   DriveSubsystem swerve;
 
-  PIDController sidewaysController = new PIDController(0.016, 0, 0);
+  PIDController sidewaysController = new PIDController(0.03, 0, 0);
   PIDController rotationController = new PIDController(0.035, 0, 0);
-  PIDController distanceController = new PIDController(0.0165, 0, 0);
+  PIDController distanceController = new PIDController(0.016, 0, 0);
 
   VisionTarget lowerCone = new VisionTarget(61, 12, 20);
 
@@ -34,37 +34,35 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public void execute() {
-    double rotation = SwerveConstants.DriveConstants.kMaxAngularSpeed
-        * rotationController.calculate(DriveSubsystem.m_gyro.getYaw(), 0);
-    lowerCone.updatePitch(FlareVisionSubsystem.getYdistance(FlareVisionSubsystem.getBestTarget()));
-    double output = SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond * 1.
-        * sidewaysController.calculate(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget()));
-    double distance = lowerCone.getDistance();
-    // systematic error is 13 centimeters
+     double rotation = SwerveConstants.DriveConstants.kMaxAngularSpeed / 10
+         * rotationController.calculate(DriveSubsystem.m_gyro.getYaw(), 0);
+     lowerCone.updatePitch(FlareVisionSubsystem.getYdistance(FlareVisionSubsystem.getBestTarget()));
+     double output = SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond / 5 * 1.
+         * sidewaysController.calculate(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget()));
+     double distance = lowerCone.getDistance();
 
-    if (Math.abs(DriveSubsystem.m_gyro.getYaw()) >= 3) {
-      swerve.drive(0, 0, rotation, false, true, true);
-    } else if (Math.abs(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget())) >= 4) {
-      swerve.drive(0, output, rotation, false, true, true);
-    } else { // Changed the setpoint
-      double distanceOutput = -distanceController.calculate(distance, 63)
-          * SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond;
-      swerve.drive(distanceOutput, output, rotation, false, true, true);
+     if (Math.abs(DriveSubsystem.m_gyro.getYaw()) >= 4d) {
+       swerve.drive(0, 0, rotation, false, true, true);
+     } else if (Math.abs(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget())) >= 2.1d) {
+       swerve.drive(0, output, rotation, false, true, true);
+     } else {  
+       double distanceOutput = -distanceController.calculate(distance, 130)
+           * SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond / 15;
+       swerve.drive(distanceOutput, output, rotation, false, true, true);
 
-    }
+     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        new ChassisSpeeds(0, 0, 0));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
-    DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
-    DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
-    DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
-    FlareVisionSubsystem.ledSpx.set(0);
+     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+         new ChassisSpeeds(0, 0, 0));
+     SwerveDriveKinematics.desaturateWheelSpeeds(
+         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+     DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+     DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
+     DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+     DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
   }
 
   @Override
