@@ -3,7 +3,9 @@ package frc.robot.commands.Auto;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.lib.VisionTarget;
@@ -23,8 +25,9 @@ public class AutoAlign extends CommandBase {
   public AutoAlign(DriveSubsystem swerve) {
     this.swerve = swerve;
     addRequirements(swerve);
+    distanceController.setTolerance(1);
     sidewaysController.setTolerance(1);
-    rotationController.setTolerance(2);
+    rotationController.setTolerance(1.5d);
   }
 
   @Override
@@ -34,6 +37,19 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public void execute() {
+    if(FlareVisionSubsystem.getBestTarget() == null)
+    {
+      RobotContainer.driver_main.setRumble(RumbleType.kLeftRumble, 1);
+      return;
+    }
+    
+    if(sidewaysController.atSetpoint() && distanceController.atSetpoint())
+    {
+      RobotContainer.driver_main.setRumble(RumbleType.kRightRumble, 1);
+      stopMotors();
+      return;
+    }
+
      double rotation = SwerveConstants.DriveConstants.kMaxAngularSpeed / 10
          * rotationController.calculate(DriveSubsystem.m_gyro.getYaw(), 0);
      lowerCone.updatePitch(FlareVisionSubsystem.getYdistance(FlareVisionSubsystem.getBestTarget()));
@@ -55,7 +71,14 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+     stopMotors();
+     FlareVisionSubsystem.ledSpx.set(0);
+     RobotContainer.driver_main.setRumble(RumbleType.kBothRumble, 0);
+  }
+
+  private void stopMotors()
+  {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
          new ChassisSpeeds(0, 0, 0));
      SwerveDriveKinematics.desaturateWheelSpeeds(
          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -67,6 +90,6 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return sidewaysController.atSetpoint() && distanceController.atSetpoint();
+    return false;
   }
 }

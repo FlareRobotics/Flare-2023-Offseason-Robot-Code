@@ -5,6 +5,8 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
+    public static boolean enableSmartDashboard = true;
+
     public static class ElevatorConstants {
         public static int elevator_motor_port = 0;
         public static double elevator_gear_ratio = 20d;

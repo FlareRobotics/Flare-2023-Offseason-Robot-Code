@@ -17,6 +17,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -86,8 +88,14 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    if(teleopPlaying)
-    return;
+    if(Constants.enableSmartDashboard)
+    {
+      SmartDashboard.putNumber("Gyro Angle", m_gyro.getYaw());
+      SmartDashboard.putString("Front Left", m_frontLeft.getPosition().toString());
+      SmartDashboard.putString("Front Right", m_frontRight.getPosition().toString());
+      SmartDashboard.putString("Rear Left", m_rearLeft.getPosition().toString());
+      SmartDashboard.putString("Rear Right", m_rearRight.getPosition().toString());
+    }
 
      // Update the odometry in the periodic block
      m_odometry.update(

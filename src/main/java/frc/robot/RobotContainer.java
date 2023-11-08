@@ -35,7 +35,6 @@ import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.CompressorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.FlareVisionSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 
 //8054 <3
@@ -45,7 +44,6 @@ public class RobotContainer {
         public static XboxController driver_2 = new XboxController(2);
 
 
-        private static final FlareVisionSubsystem flarevisionsubsystem = new FlareVisionSubsystem();
         private static final ElevatorSubsystem elevatorsubsystem = new ElevatorSubsystem();
         private static final ClawSubsystem clawSubsystem = new ClawSubsystem();
         private static final CompressorSubsystem compressorSubsystem = new CompressorSubsystem();
