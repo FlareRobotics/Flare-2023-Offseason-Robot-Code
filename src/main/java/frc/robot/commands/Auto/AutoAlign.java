@@ -39,13 +39,12 @@ public class AutoAlign extends CommandBase {
   public void execute() {
     if(FlareVisionSubsystem.getBestTarget() == null)
     {
-      RobotContainer.driver_main.setRumble(RumbleType.kLeftRumble, 1);
       return;
     }
     
     if(sidewaysController.atSetpoint() && distanceController.atSetpoint())
     {
-      RobotContainer.driver_main.setRumble(RumbleType.kRightRumble, 1);
+      RobotContainer.driver_main.setRumble(RumbleType.kBothRumble, 1);
       stopMotors();
       return;
     }
