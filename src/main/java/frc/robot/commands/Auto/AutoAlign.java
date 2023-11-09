@@ -4,7 +4,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
@@ -13,7 +15,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FlareVisionSubsystem;
 
 public class AutoAlign extends CommandBase {
-  /** Creates a new AutoAlign. */
   DriveSubsystem swerve;
 
   PIDController sidewaysController = new PIDController(0.03, 0, 0);
@@ -37,6 +38,14 @@ public class AutoAlign extends CommandBase {
 
   @Override
   public void execute() {
+
+    if(Constants.enableSmartDashboard)
+    {
+      SmartDashboard.putBoolean("Distance At Setpoint", distanceController.atSetpoint());
+      SmartDashboard.putBoolean("Sideways At Setpoint", sidewaysController.atSetpoint());
+      SmartDashboard.putBoolean("Rotation At Setpoint", rotationController.atSetpoint());
+    }
+
     if(FlareVisionSubsystem.getBestTarget() == null)
     {
       return;
