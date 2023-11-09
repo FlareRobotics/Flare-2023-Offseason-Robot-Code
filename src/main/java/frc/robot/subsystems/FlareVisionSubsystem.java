@@ -22,20 +22,10 @@ public class FlareVisionSubsystem extends SubsystemBase {
   
 
   @Override
-  public void periodic() {
+  public void periodic() {    
     if(!Constants.enableSmartDashboard)
       return;
 
-    if(camera != null && camera.getLatestResult() != null)
-    {
-      SmartDashboard.putBoolean("Has Target", camera.getLatestResult().hasTargets());
-
-      if(camera.getLatestResult().hasTargets())
-      {
-        SmartDashboard.putNumber("Target X", camera.getLatestResult().getBestTarget().getYaw());
-        SmartDashboard.putNumber("Target Y", camera.getLatestResult().getBestTarget().getPitch());
-      }
-    }
   }
 
   public static PhotonTrackedTarget getBestTarget() {

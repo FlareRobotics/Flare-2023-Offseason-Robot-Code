@@ -18,17 +18,13 @@ public class AutoAlign extends CommandBase {
   DriveSubsystem swerve;
 
   PIDController sidewaysController = new PIDController(0.03, 0, 0);
-  PIDController rotationController = new PIDController(0.035, 0, 0);
-  PIDController distanceController = new PIDController(0.016, 0, 0);
 
   VisionTarget lowerCone = new VisionTarget(61, 12, 20);
 
   public AutoAlign(DriveSubsystem swerve) {
     this.swerve = swerve;
     addRequirements(swerve);
-    distanceController.setTolerance(1);
     sidewaysController.setTolerance(1);
-    rotationController.setTolerance(1.5d);
   }
 
   @Override
@@ -41,39 +37,22 @@ public class AutoAlign extends CommandBase {
 
     if(Constants.enableSmartDashboard)
     {
-      SmartDashboard.putBoolean("Distance At Setpoint", distanceController.atSetpoint());
       SmartDashboard.putBoolean("Sideways At Setpoint", sidewaysController.atSetpoint());
-      SmartDashboard.putBoolean("Rotation At Setpoint", rotationController.atSetpoint());
     }
     
-    if(sidewaysController.atSetpoint() && distanceController.atSetpoint())
-    {
-      RobotContainer.driver_main.setRumble(RumbleType.kBothRumble, 1);
-      stopMotors();
-      return;
-    }
+  
 
     if(FlareVisionSubsystem.getBestTarget() == null)
     {
+      
       return;
     }
 
-     double rotation = SwerveConstants.DriveConstants.kMaxAngularSpeed / 10
-         * rotationController.calculate(DriveSubsystem.m_gyro.getYaw(), 0);
-     lowerCone.updatePitch(FlareVisionSubsystem.getYdistance(FlareVisionSubsystem.getBestTarget()));
-     double output = SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond / 5 * 1.
+     double output = SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond / 10 * 1.
          * sidewaysController.calculate(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget()));
-     double distance = lowerCone.getDistance();
 
-     if (Math.abs(DriveSubsystem.m_gyro.getYaw()) >= 4d) {
-       swerve.drive(0, 0, rotation, false, true, true);
-     } else if (Math.abs(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget())) >= 2.1d) {
-       swerve.drive(0, output, rotation, false, true, true);
-     } else {  
-       double distanceOutput = -distanceController.calculate(distance, 130)
-           * SwerveConstants.DriveConstants.kMaxSpeedMetersPerSecond / 15;
-       swerve.drive(distanceOutput, output, rotation, false, true, true);
-
+    if (Math.abs(FlareVisionSubsystem.getDistanceToGoal(FlareVisionSubsystem.getBestTarget())) >= 1.5d) {
+       swerve.drive(0, output, 0, false, true, true);
      }
   }
 
