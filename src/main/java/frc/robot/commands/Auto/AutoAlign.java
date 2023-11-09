@@ -45,16 +45,16 @@ public class AutoAlign extends CommandBase {
       SmartDashboard.putBoolean("Sideways At Setpoint", sidewaysController.atSetpoint());
       SmartDashboard.putBoolean("Rotation At Setpoint", rotationController.atSetpoint());
     }
-
-    if(FlareVisionSubsystem.getBestTarget() == null)
-    {
-      return;
-    }
     
     if(sidewaysController.atSetpoint() && distanceController.atSetpoint())
     {
       RobotContainer.driver_main.setRumble(RumbleType.kBothRumble, 1);
       stopMotors();
+      return;
+    }
+
+    if(FlareVisionSubsystem.getBestTarget() == null)
+    {
       return;
     }
 
