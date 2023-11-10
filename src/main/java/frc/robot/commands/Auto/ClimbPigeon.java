@@ -1,6 +1,7 @@
 package frc.robot.commands.Auto;
 
-
+import frc.robot.RobotContainer;
+import frc.robot.Custom.RobotState;
 import frc.robot.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,6 +13,7 @@ public class ClimbPigeon extends CommandBase {
 
   double mps;
   DriveSubsystem subsystem;
+
   public ClimbPigeon(DriveSubsystem driveSubsystem, double MPS) {
     subsystem = driveSubsystem;
     mps = MPS;
@@ -20,39 +22,55 @@ public class ClimbPigeon extends CommandBase {
 
   @Override
   public void initialize() {
-   
+
   }
 
   @Override
   public void execute() {
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-      ChassisSpeeds.fromFieldRelativeSpeeds(0, mps, 0,
-                Rotation2d.fromDegrees(DriveSubsystem.m_gyro.getYaw())));
+    if (DriveSubsystem.m_gyro.getPitch() > 3d) {
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+          ChassisSpeeds.fromFieldRelativeSpeeds(mps * (DriveSubsystem.m_gyro.getPitch() > 0 ? -1 : 1), 0, 0,
+              Rotation2d.fromDegrees(DriveSubsystem.m_gyro.getYaw())));
 
-  SwerveDriveKinematics.desaturateWheelSpeeds(
-      swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-  DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
-  DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
-  DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
-  DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
+      SwerveDriveKinematics.desaturateWheelSpeeds(
+          swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+      DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+      DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
+      DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+      DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
+    }
+    else
+    {
+      var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        new ChassisSpeeds(0, 0, 0));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+    DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
+    DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+    DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
+
+    DriveSubsystem.setBrake(true);
+    RobotContainer.currentState = RobotState.Balanced;
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-      new ChassisSpeeds(0, 0, 0));
-  SwerveDriveKinematics.desaturateWheelSpeeds(
-      swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-  DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
-  DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
-  DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
-  DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
+        new ChassisSpeeds(0, 0, 0));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    DriveSubsystem.m_frontLeft.setDesiredState(swerveModuleStates[0], true);
+    DriveSubsystem.m_frontRight.setDesiredState(swerveModuleStates[1], true);
+    DriveSubsystem.m_rearLeft.setDesiredState(swerveModuleStates[2], true);
+    DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
 
-  DriveSubsystem.setBrake(true);
+    DriveSubsystem.setBrake(true);
   }
 
   @Override
   public boolean isFinished() {
-    return DriveSubsystem.m_gyro.getPitch() < 4.5d;
+    return false;
   }
 }

@@ -77,6 +77,9 @@ public class RobotContainer {
                 autoChooser.addOption("RM Cube Balance", 10);
                 autoChooser.addOption("BM Cube Balance", 11);
 
+                autoChooser.addOption("RN Traj Balance", 12);
+                autoChooser.addOption("BN Traj Balance", 13);
+
                 autoChooser.setDefaultOption("No Auto", 6);
 
                 autoChooser.addOption("Only Cube", 7);
@@ -205,6 +208,7 @@ public class RobotContainer {
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
                                         .andThen(getTraj(traj)
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
                                                         .andThen(new RobotStateChanger(1)));
                 } 
                 else if (autoChooser.getSelected().equals(10)) // Red Middle Balance
@@ -214,11 +218,31 @@ public class RobotContainer {
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
                                         .andThen(getTraj(traj)
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
                                                         .andThen(new RobotStateChanger(1)));
                 } 
                 else if (autoChooser.getSelected().equals(11)) // Blue Middle Balance
                 {
                         PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Middle_Balance",
+                                        new PathConstraints(3, 2));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
+                else if (autoChooser.getSelected().equals(12)) // Red Traj Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Red_Traj_Balance",
+                                        new PathConstraints(3, 2));
+                        m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
+                        return placeCubeCommand()
+                                        .andThen(getTraj(traj)
+                                                        .andThen(new RobotStateChanger(1)));
+                } 
+                else if (autoChooser.getSelected().equals(13)) // Blue Traj Balance
+                {
+                        PathPlannerTrajectory traj = PathPlanner.loadPath("Blue_Traj_Balance",
                                         new PathConstraints(3, 2));
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
@@ -232,6 +256,7 @@ public class RobotContainer {
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
                                         .andThen(getTraj(traj)
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
                                                         .andThen(new RobotStateChanger(1)));
                 } 
                 else if (autoChooser.getSelected().equals(1)) // Cube + Mobility + Balance
@@ -241,7 +266,7 @@ public class RobotContainer {
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
                                         .andThen(getTraj(traj))
-                                        .andThen(new ClimbPigeon(m_robotDrive, -0.5))
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
                                         .andThen(new RobotStateChanger(1));
                 } 
                 else if (autoChooser.getSelected().equals(3)) // Red Normal Mobility
@@ -269,7 +294,7 @@ public class RobotContainer {
                         m_robotDrive.resetOdometry(traj.getInitialHolonomicPose());
                         return placeCubeCommand()
                                         .andThen(getTraj(traj))
-                                        .andThen(new ClimbPigeon(m_robotDrive, -0.5))
+                                        .andThen(new ClimbPigeon(m_robotDrive, 0.5))
                                         .andThen(new RobotStateChanger(1));
                 }
 
