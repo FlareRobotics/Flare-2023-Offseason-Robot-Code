@@ -22,12 +22,12 @@ public class ClimbPigeon extends CommandBase {
 
   @Override
   public void initialize() {
-
+    System.out.println("goonmbbjjhbjhbhvjjvhvvhjjvhhvjhvjvhjjvhvhjvhj");
   }
 
   @Override
   public void execute() {
-    if (DriveSubsystem.m_gyro.getPitch() > 3d) {
+    if (Math.abs(DriveSubsystem.m_gyro.getPitch()) > 3d) {
       var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
           ChassisSpeeds.fromFieldRelativeSpeeds(mps * (DriveSubsystem.m_gyro.getPitch() > 0 ? -1 : 1), 0, 0,
               Rotation2d.fromDegrees(DriveSubsystem.m_gyro.getYaw())));
@@ -51,7 +51,7 @@ public class ClimbPigeon extends CommandBase {
     DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
 
     DriveSubsystem.setBrake(true);
-    RobotContainer.currentState = RobotState.Balanced;
+
     }
   }
 
@@ -67,6 +67,7 @@ public class ClimbPigeon extends CommandBase {
     DriveSubsystem.m_rearRight.setDesiredState(swerveModuleStates[3], true);
 
     DriveSubsystem.setBrake(true);
+    System.out.println(interrupted);
   }
 
   @Override
