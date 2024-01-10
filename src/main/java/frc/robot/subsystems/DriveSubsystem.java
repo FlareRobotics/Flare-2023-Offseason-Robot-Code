@@ -4,10 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 //CTRE Imports
 import com.ctre.phoenix.sensors.Pigeon2;
-
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,9 +23,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.math.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.SwerveConstants;
 import frc.robot.SwerveConstants.DriveConstants;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -76,7 +84,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      }, new Pose2d(1.95d, 3.3d, Rotation2d.fromDegrees(m_gyro.getYaw())));
+      });
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -84,12 +92,10 @@ public class DriveSubsystem extends SubsystemBase {
     zeroHeading();
   }
 
-
   @Override
   public void periodic() {
 
-    if(Constants.enableSmartDashboard)
-    {
+    if (Constants.enableSmartDashboard) {
       SmartDashboard.putNumber("Gyro Pitch", m_gyro.getPitch());
       SmartDashboard.putNumber("Gyro Angle", m_gyro.getYaw());
       SmartDashboard.putString("Front Left", m_frontLeft.getPosition().toString());
@@ -98,15 +104,32 @@ public class DriveSubsystem extends SubsystemBase {
       SmartDashboard.putString("Rear Right", m_rearRight.getPosition().toString());
     }
 
-     // Update the odometry in the periodic block
-     m_odometry.update(
-      Rotation2d.fromDegrees(m_gyro.getYaw()),
-      new SwerveModulePosition[] {
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        Rotation2d.fromDegrees(m_gyro.getYaw()),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+        });
+
+    if (LimelightHelpers.getTV("Limelight")) {
+      m_odometry.resetPosition(Rotation2d.fromDegrees(m_gyro.getYaw()), new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      }, LimelightHelpers.getBotPose2d("Limelight"));
+    }
+  }
+
+  public Command returnPathCommand(Pose2d pose2d, PathConstraints constraints) {
+    PathPoint startPoint = new PathPoint(getPose().getTranslation(), new Rotation2d(getHeading()));
+    PathPoint endPoint = new PathPoint(pose2d.getTranslation(), pose2d.getRotation());
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(constraints, List.of(startPoint, endPoint));
+
+    return RobotContainer.getTraj(trajectory);
   }
 
   /**
@@ -238,15 +261,4 @@ public class DriveSubsystem extends SubsystemBase {
   public double getHeading() {
     return Rotation2d.fromDegrees(m_gyro.getYaw()).getDegrees();
   }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   * 
-   *         public double getTurnRate() {
-   *         return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 :
-   *         1.0);
-   *         }
-   */
 }
