@@ -1,2 +1,2 @@
-# Flare-2023-Offseason-Robotcode
-Flare Robotics #8054 2023 Offseason Robot Code
+# Flare-2024-Template
+Basic template to start for FLARE 2024 Crescendo season.
